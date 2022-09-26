@@ -135,7 +135,6 @@ class CBSSolver(object):
         self.print_results(root)
         return root['paths']
 
-
     def print_results(self, node):
         print("\n Found a solution! \n")
         CPU_time = timer.time() - self.start_time
