@@ -4,6 +4,7 @@ This file contains the AircraftDistributed class that can be used to implement i
 Code in this file is just provided as guidance, you are free to deviate from it.
 """
 
+
 class AircraftDistributed(object):
     """Aircraft object to be used in the distributed planner."""
 
