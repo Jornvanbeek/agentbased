@@ -11,23 +11,24 @@ from pathlib import Path
 from cbs import CBSSolver
 from independent import IndependentSolver
 from prioritized import PrioritizedPlanningSolver
-from distributed import DistributedPlanningSolver # Placeholder for Distributed Planning
+from distributed import DistributedPlanningSolver  # Placeholder for Distributed Planning
 from visualize import Animation
 from single_agent_planner import get_sum_of_cost
 
 # instance = open('instances/exp0.txt','r').read()
 
-#new
+# new
 defaultinstance = 'instances/exp0.txt'
 
 SOLVER = "Independent"
 # SOLVER = 'Independent'
 
+
 def print_mapf_instance(my_map, starts, goals):
     """
     Prints start location and goal location of all agents, using @ for an obstacle, . for a open cell, and 
     a number for the start location of each agent.
-    
+
     Example:
         @ @ @ @ @ @ @ 
         @ 0 1 . . . @ 
@@ -69,7 +70,7 @@ def import_mapf_instance(filename):
         Line X+1: xCoordStart yCoordStart xCoordGoal yCoordGoal (xy coordinate start and goal for Agent 1)
         Line X+2: xCoordStart yCoordStart xCoordGoal yCoordGoal (xy coordinate start and goal for Agent 2)
         Line X+n: xCoordStart yCoordStart xCoordGoal yCoordGoal (xy coordinate start and goal for Agent n)
-        
+
     Example:
         4 7             # grid with 4 rows and 7 columns
         @ @ @ @ @ @ @   # example row with obstacle in every column
@@ -126,7 +127,7 @@ if __name__ == '__main__':
                         help='The solver to use (one of: {CBS,Independent,Prioritized}), defaults to ' + str(SOLVER))
 
     args = parser.parse_args()
-    # Hint: Command line options can be added in Spyder by pressing CTRL + F6 > Command line options. 
+    # Hint: Command line options can be added in Spyder by pressing CTRL + F6 > Command line options.
     # In PyCharm, they can be added as parameters in the configuration.
 
     result_file = open("results.csv", "w", buffering=1)
@@ -151,14 +152,14 @@ if __name__ == '__main__':
             paths = solver.find_solution()
         elif args.solver == "Distributed":  # Wrapper of distributed planning solver class
             print("***Run Distributed Planning***")
-            solver = DistributedPlanningSolver(my_map, starts, goals, ...) #!!!TODO: add your own distributed planning implementation here.
+            # !!!TODO: add your own distributed planning implementation here.
+            solver = DistributedPlanningSolver(my_map, starts, goals, ...)
             paths = solver.find_solution()
-        else: 
+        else:
             raise RuntimeError("Unknown solver!")
 
         cost = get_sum_of_cost(paths)
         result_file.write("{},{}\n".format(file, cost))
-
 
         if not args.batch:
             print("***Test paths on a simulation***")
