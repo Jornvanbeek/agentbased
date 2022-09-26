@@ -44,7 +44,6 @@ class PrioritizedPlanningSolver(object):
             #            * self.num_of_agents has the number of total agents
             #            * constraints: array of constraints to consider for future A* searches
 
-
             ##############################
 
         self.CPU_time = timer.time() - start_time
