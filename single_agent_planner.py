@@ -1,7 +1,8 @@
 import heapq
 
+
 def move(loc, dir):
-    directions = [(0, -1), (1, 0), (0, 1), (-1, 0), (0,0)] #added 0,0 for 0 velocity, but increase timestep
+    directions = [(0, -1), (1, 0), (0, 1), (-1, 0), (0, 0)]  # added 0,0 for 0 velocity, but increase timestep
     return loc[0] + directions[dir][0], loc[1] + directions[dir][1]
 
 
@@ -26,7 +27,7 @@ def compute_heuristics(my_map, goal):
             child_cost = cost + 1
             if child_loc[0] < 0 or child_loc[0] >= len(my_map) \
                or child_loc[1] < 0 or child_loc[1] >= len(my_map[0]):
-               continue
+                continue
             if my_map[child_loc[0]][child_loc[1]]:
                 continue
             child = {'loc': child_loc, 'cost': child_cost}
@@ -51,7 +52,7 @@ def build_constraint_table(constraints, agent):
     ##############################
     # Task 1.2/1.3: Return a table that constains the list of constraints of
     #               the given agent for each time step. The table can be used
-    #               for a more efficient constraint violation check in the 
+    #               for a more efficient constraint violation check in the
     #               is_constrained function.
 
     pass
@@ -115,9 +116,9 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
     closed_list = dict()
     earliest_goal_timestep = 0
     h_value = h_values[start_loc]
-    root = {'loc': start_loc, 'g_val': 0, 'h_val': h_value, 'timestep' : 0, 'parent': None}
+    root = {'loc': start_loc, 'g_val': 0, 'h_val': h_value, 'timestep': 0, 'parent': None}
     push_node(open_list, root)
-    closed_list[(root['loc'],root['timestep'])] = root
+    closed_list[(root['loc'], root['timestep'])] = root
     while len(open_list) > 0:
         curr = pop_node(open_list)
         #############################
@@ -129,22 +130,21 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
             if my_map[child_loc[0]][child_loc[1]]:
                 continue
             child = {'loc': child_loc,
-                    'g_val': curr['g_val'] + 1,
-                    'h_val': h_values[child_loc],
-                    'timestep': curr['timestep'] + 1,
-                    'parent': curr}
-            #if location visited before:
-            if (child['loc'],child['timestep']) in closed_list:
-                existing_node = closed_list[(child['loc'],child['timestep'])]
-                #if visited before and path plus heuristic path shorter, then old node replaced by child
+                     'g_val': curr['g_val'] + 1,
+                     'h_val': h_values[child_loc],
+                     'timestep': curr['timestep'] + 1,
+                     'parent': curr}
+            # if location visited before:
+            if (child['loc'], child['timestep']) in closed_list:
+                existing_node = closed_list[(child['loc'], child['timestep'])]
+                # if visited before and path plus heuristic path shorter, then old node replaced by child
                 if compare_nodes(child, existing_node):
-                    closed_list[(child['loc'],child['timestep'])] = child
+                    closed_list[(child['loc'], child['timestep'])] = child
                     push_node(open_list, child)
-            #not visited before just add the child 
+            # not visited before just add the child
             else:
-                closed_list[(child['loc'],child['timestep'])] = child
+                closed_list[(child['loc'], child['timestep'])] = child
                 push_node(open_list, child)
         print(closed_list)
-    
 
     return None  # Failed to find solutions
