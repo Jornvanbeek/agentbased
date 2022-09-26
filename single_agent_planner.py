@@ -145,6 +145,5 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
             else:
                 closed_list[(child['loc'], child['timestep'])] = child
                 push_node(open_list, child)
-        print(closed_list)
 
     return None  # Failed to find solutions
