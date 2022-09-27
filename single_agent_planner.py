@@ -55,7 +55,7 @@ def build_constraint_table(constraints, agent):
     #               for a more efficient constraint violation check in the
     #               is_constrained function.
 
-    pass
+    return
 
 
 def get_location(path, time):
@@ -79,6 +79,8 @@ def get_path(goal_node):
 
 def is_constrained(curr_loc, next_loc, next_time, constraint_table):
     ##############################
+    if next_loc in constraint_table and next_time in constraint_table:
+        return True
     # Task 1.2/1.3: Check if a move from curr_loc to next_loc at time step next_time violates
     #               any given constraint. For efficiency the constraints are indexed in a constraint_table
     #               by time step, see build_constraint_table.
@@ -116,6 +118,7 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
     closed_list = dict()
     earliest_goal_timestep = 0
     h_value = h_values[start_loc]
+    constraint_table = build_constraint_table(constraints, agent)
     root = {'loc': start_loc, 'g_val': 0, 'h_val': h_value, 'timestep': 0, 'parent': None}
     push_node(open_list, root)
     closed_list[(root['loc'], root['timestep'])] = root
@@ -127,6 +130,8 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
             return get_path(curr)
         for dir in range(5):
             child_loc = move(curr['loc'], dir)
+            if is_constrained(curr['loc'], child_loc, curr['timestep']+1, constraint_table):  # check of er een constraint is
+                child_loc = curr['loc']  # Als er een constraint is, dan blijft de agent op de zelfde plek
             if my_map[child_loc[0]][child_loc[1]]:
                 continue
             child = {'loc': child_loc,
