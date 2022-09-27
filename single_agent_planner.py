@@ -52,10 +52,19 @@ def build_constraint_table(constraints, agent):
     ##############################
     # Task 1.2/1.3: Return a table that constains the list of constraints of
     #               the given agent for each time step. The table can be used
-    #               for a more efficient constraint violation check in the
+    #               for a more efficient constraint violation check in the 
     #               is_constrained function.
-
-    pass
+    constraint_table = []
+    j = 1
+    for i in range(len(constraints)):
+        if constraints[i]["agent"] == agent:
+            j = constraints[i]["timestep"]
+            while len(constraint_table) < j+1:
+                constraint_table.append([])
+                
+            constraint_table[j].append(constraints[i])
+            
+    return constraint_table
 
 
 def get_location(path, time):
