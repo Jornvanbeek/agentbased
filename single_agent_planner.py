@@ -57,6 +57,18 @@ def build_constraint_table(constraints, agent):
 
     return
 
+    constraint_table = []
+    j = 1
+    for i in range(len(constraints)):
+        if constraints[i]["agent"] == agent:
+            j = constraints[i]["timestep"]
+            while len(constraint_table) < j+1:
+                constraint_table.append([])
+
+            constraint_table[j].append(constraints[i])
+
+    return constraint_table
+
 
 def get_location(path, time):
     if time < 0:
