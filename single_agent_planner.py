@@ -8,9 +8,17 @@ def move(loc, dir):
 
 def get_sum_of_cost(paths):
     rst = 0
+    wait = 0
     for path in paths:
-        rst += len(path) - 1
-    return rst
+
+        for i in range(1, len(path)):
+            if path[i] == path[i-1]:
+                wait += 1
+                continue
+            else:
+                rst += 1
+        # rst += len(path) - 1
+    return [rst, wait]
 
 
 def compute_heuristics(my_map, goal):
@@ -94,16 +102,16 @@ def is_constrained(curr_loc, next_loc, next_time, constraint_table):
     if constraint_table != None and len(constraint_table)>next_time:   #check if there are entries in the constraint table for this timestep
         constraints = constraint_table[next_time]  #retreive constraints for the next timestep
         
-        goal_constraints = constraint_table[0]
-        if len(goal_constraints)>0:
-            for j in range(len(goal_constraints)):
-                goalcon = goal_constraints[j]
-                if len(goalcon) == 5:
-                    if next_time > goalcon['reachtime']-1:
-                        goalcon['timestep'] = next_time
-                        constraints.append(goalcon)
+        # goal_constraints = constraint_table[0]
+        # if len(goal_constraints)>0:
+        #     for j in range(len(goal_constraints)):
+        #         goalcon = goal_constraints[j]
+        #         if len(goalcon) == 5:
+        #             if next_time > goalcon['reachtime']-1:
+        #                 goalcon['timestep'] = next_time
+        #                 constraints.append(goalcon)
         
-        if len(constraints)>0:              #any constraint for this timestep?
+        if len(constraints) > 0:              #any constraint for this timestep?
             for i in range(len(constraints)):   #loop over constraints
                 con = constraints[i]
                 
@@ -117,7 +125,7 @@ def is_constrained(curr_loc, next_loc, next_time, constraint_table):
                         return True
                     else:
                         continue
-                elif len(con['loc']) == 2:          #if edge constraint
+                if len(con['loc']) == 2:          #if edge constraint
                     if con['loc'][0] == curr_loc and con['loc'][1] == next_loc: #if move from curr_loc to next_loc forbidden
                         return True
                     else:
@@ -194,6 +202,7 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
                     return get_path(curr)
                 else:
                     continue
+        
             
 
             
