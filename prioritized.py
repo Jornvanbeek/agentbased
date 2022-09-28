@@ -29,14 +29,14 @@ class PrioritizedPlanningSolver(object):
         start_time = timer.time()
         result = []
         constraints = []
-        constraints = [{'agent': 0,'loc': [(1,5)],'timestep': 4}, 
-                       {'agent': 0,'loc': [(1,4)],'timestep': 3},
-                       {'agent': 0,'loc': [(1,4)],'timestep': 4},
-                       {'agent': 0,'loc': [(1,4)],'timestep': 5},
-                       {'agent': 0,'loc': [(1,3)],'timestep': 5},
-                       {'agent': 0,'loc': [(1,3)],'timestep': 3},
-                       {'agent': 0,'loc': [(1,3)],'timestep': 4},
-               {'agent': 1,'loc': [(3,2)],'timestep': 2}]
+        constraints = [{'agent': 0, 'loc': [(1, 5)], 'timestep': 4},
+                       {'agent': 0, 'loc': [(1, 4)], 'timestep': 3},
+                       {'agent': 0, 'loc': [(1, 4)], 'timestep': 4},
+                       {'agent': 0, 'loc': [(1, 4)], 'timestep': 5},
+                       {'agent': 0, 'loc': [(1, 3)], 'timestep': 5},
+                       {'agent': 0, 'loc': [(1, 3)], 'timestep': 3},
+                       {'agent': 0, 'loc': [(1, 3)], 'timestep': 4},
+                       {'agent': 1, 'loc': [(3, 2)], 'timestep': 2}]
 
         for i in range(self.num_of_agents):  # Find path for each agent
             path = a_star(self.my_map, self.starts[i], self.goals[i], self.heuristics[i],
@@ -58,6 +58,7 @@ class PrioritizedPlanningSolver(object):
 
         print("\n Found a solution! \n")
         print("CPU time (s):    {:.2f}".format(self.CPU_time))
-        print("Sum of costs:    {}".format(get_sum_of_cost(result)))
+        print("Sum of costs:    {}".format(get_sum_of_cost(result)[0]))
+        print("Waiting time:    {}".format(get_sum_of_cost(result)[1]))
         print(result)
         return result
