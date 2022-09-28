@@ -96,7 +96,7 @@ def is_constrained(curr_loc, next_loc, next_time, constraint_table):
         if len(constraints)>0:              #any constraint for this timestep?
             for i in range(len(constraints)):   #loop over constraints
                 con = constraints[i]
-                #print("constraint: ", con)
+        
                 if len(con['loc']) == 1:            #if vertex constraint
                     if con['loc'][0] == next_loc:   # if location is constrained
                         return True
@@ -116,14 +116,7 @@ def is_constrained(curr_loc, next_loc, next_time, constraint_table):
         
         
         
-        
-    # if next_loc in constraint_table and next_time in constraint_table:
-    #         return True
-    #     elif 
-    #     else:
-    #         return False
-    # else:
-    #     return False
+    
     # Task 1.2/1.3: Check if a move from curr_loc to next_loc at time step next_time violates
     #               any given constraint. For efficiency the constraints are indexed in a constraint_table
     #               by time step, see build_constraint_table.
@@ -167,29 +160,24 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
     closed_list[(root['loc'], root['timestep'])] = root
     while len(open_list) > 0:
         curr = pop_node(open_list)
+        
+        
+        
         #############################
         # Task 1.4: Adjust the goal test condition to handle goal constraints
-        timestep = root['timestep']
+        timestep = curr['timestep']
         if curr['loc'] == goal_loc:
-            return get_path(curr)
+            if timestep > len(constraint_table): #no more constraints after this time so easy shortcut
+                return get_path(curr)
+                
+            else:
+                for i in range(timestep,len(constraint_table)):
+                    if is_constrained(goal_loc, goal_loc, i, constraint_table):
+                        continue
+                return get_path(curr)
             
-            # if timestep > len(constraint_table): #no more constraints after this time so easy shortcut
-            #     return get_path(curr)
+
             
-            # else:
-            #     con = False
-            #     for i in range(timestep,len(constraint_table)):
-            #         while con == False:
-            #             if is_constrained(curr['loc'], curr['loc'], curr['timestep']+1, constraint_table):
-            #                 con = True
-            #             else:
-            #                 con = False
-            #     if con == False:
-            #         return get_path(curr)
-            #     elif con == True:
-            #         break
-                        
-        
         
         # move and check constraints
         for dir in range(5):
@@ -197,7 +185,7 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
             
             #is there a constraint?
             if is_constrained(curr['loc'], child_loc, curr['timestep']+1, constraint_table):  
-                continue#child_loc = curr['loc']  # revert to old (current) location
+                continue
             if my_map[child_loc[0]][child_loc[1]]:
                 continue
             
