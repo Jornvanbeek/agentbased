@@ -2,7 +2,7 @@ import heapq
 
 
 def move(loc, dir):
-    directions = [(0, -1), (1, 0), (0, 1), (-1, 0), (0, 0)]  # added 0,0 for 0 velocity, but increase timestep
+    directions = [(0, 0),(0, -1), (1, 0), (0, 1), (-1, 0)]  # added 0,0 for 0 velocity, but increase timestep
     return loc[0] + directions[dir][0], loc[1] + directions[dir][1]
 
 
@@ -93,10 +93,25 @@ def is_constrained(curr_loc, next_loc, next_time, constraint_table):
     ##############################     length of the constraint table must be larger than next time (len is max(i) + 1)
     if constraint_table != None and len(constraint_table)>next_time:   #check if there are entries in the constraint table for this timestep
         constraints = constraint_table[next_time]  #retreive constraints for the next timestep
+        
+        goal_constraints = constraint_table[0]
+        if len(goal_constraints)>0:
+            for j in range(len(goal_constraints)):
+                goalcon = goal_constraints[j]
+                if len(goalcon) == 5:
+                    if next_time > goalcon['reachtime']-1:
+                        goalcon['timestep'] = next_time
+                        constraints.append(goalcon)
+        
         if len(constraints)>0:              #any constraint for this timestep?
             for i in range(len(constraints)):   #loop over constraints
                 con = constraints[i]
-        
+                
+                
+                # if list(con.keys())[-1] == 'goal':
+                
+                #     constraint_table[next_time+1].append(con)
+                    
                 if len(con['loc']) == 1:            #if vertex constraint
                     if con['loc'][0] == next_loc:   # if location is constrained
                         return True
@@ -171,10 +186,14 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
                 return get_path(curr)
                 
             else:
+                con = 0
                 for i in range(timestep,len(constraint_table)):
                     if is_constrained(goal_loc, goal_loc, i, constraint_table):
-                        continue
-                return get_path(curr)
+                        con += 1
+                if con ==0:  
+                    return get_path(curr)
+                else:
+                    continue
             
 
             
