@@ -101,12 +101,12 @@ def is_constrained(curr_loc, next_loc, next_time, constraint_table):
                     if con['loc'][0] == next_loc:   # if location is constrained
                         return True
                     else:
-                        return False
+                        continue
                 elif len(con['loc']) == 2:          #if edge constraint
                     if con['loc'][0] == curr_loc and con['loc'][1] == next_loc: #if move from curr_loc to next_loc forbidden
                         return True
                     else:
-                        return False
+                        continue
                 else:
                     raise RuntimeError("length of given constraint is not 1 or 2! constraint: ", con)
             else:
@@ -197,7 +197,7 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
             
             #is there a constraint?
             if is_constrained(curr['loc'], child_loc, curr['timestep']+1, constraint_table):  
-                child_loc = curr['loc']  # revert to old (current) location
+                continue#child_loc = curr['loc']  # revert to old (current) location
             if my_map[child_loc[0]][child_loc[1]]:
                 continue
             
