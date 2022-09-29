@@ -55,20 +55,16 @@ class PrioritizedPlanningSolver(object):
             ##############################
             
             
-            for k in range(len(path)):
+            for k in range(1,len(path)):
                 for l in range( self.num_of_agents):
-                    if k != i:
+                    if l != i:
                         constraints.append({'agent': l, 'loc': [path[k]], 'timestep': k})
                         if k > 1:
                             constraints.append({'agent': l, 'loc': [path[k], path[k-1]], 'timestep': k})
             
-            # for j in range(len(path)):
-            #     for k in range(self.num_of_agents):
-                
-            #         if i != k:
-            #             constraints.append({'agent': k, 'loc': path[j], 'timestep': j})
-            #             if j > 0:
-            #                 constraints.append({'agent': k, 'loc': [path[j], path[j-1]], 'timestep': j})
+            for l in range( self.num_of_agents):
+                if l != i:
+                    constraints.append({'agent': l, 'loc': [path[-1]], 'timestep': 0, 'goaltime': len(path)-1})
                     
                 
         self.CPU_time = timer.time() - start_time
