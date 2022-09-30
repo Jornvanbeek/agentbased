@@ -1,5 +1,12 @@
 import heapq
 
+#what has changed in this file?
+# move=> added a direction to stand still
+# sum of costs => added waiting time
+# compute_heuristics => dir in range 5 instead of 4
+# build constraint table => added all functionality
+# is constrained => added all functionality: check for constraints at vertex, edge, or if the next vertex is a reached goal
+# A star => 
 
 def move(loc, dir):
     directions = [(0, 0),(0, -1), (1, 0), (0, 1), (-1, 0)]  # added 0,0 for 0 velocity, but increase timestep
@@ -57,23 +64,16 @@ def compute_heuristics(my_map, goal):
 
 
 def build_constraint_table(constraints, agent):
-    ##############################
-    # Task 1.2/1.3: Return a table that constains the list of constraints of
-    #               the given agent for each time step. The table can be used
-    #               for a more efficient constraint violation check in the
-    #               is_constrained function.
-
-
 
     constraint_table = []
     j = 1
     for i in range(len(constraints)):
-        if constraints[i]["agent"] == agent: #filter out constraints not belonging to this agent
-            j = constraints[i]["timestep"]   #save the timestep of the current constraint as integer
+        if constraints[i]["agent"] == agent:                         #filter out constraints not belonging to this agent
+            j = constraints[i]["timestep"]                           #save the timestep of the current constraint as integer
             while len(constraint_table) < j+1: 
-                constraint_table.append([]) #make sure constraint table is as long as the largest timestep to index by timestep
+                constraint_table.append([])                          #make sure constraint table is as long as the largest timestep to index by timestep
 
-            constraint_table[j].append(constraints[i])  #add constraints to the constraints table, index is timestep
+            constraint_table[j].append(constraints[i])               #add constraints to the constraints table, index is timestep
 
     return constraint_table
 
@@ -99,44 +99,43 @@ def get_path(goal_node):
 
 def is_constrained(curr_loc, next_loc, next_time, constraint_table):
     ##############################     length of the constraint table must be larger than next time (len is max(i) + 1)
-    if constraint_table != None and len(constraint_table)>0:   #check if there are entries in the constraint table for this timestep
-          #retreive constraints for the next timestep
+    if constraint_table != None and len(constraint_table)>0:        #check if there are entries in the constraint table
+                 
+        #------------------- first check is if the next location is a goal of another agent, that has already been reached
         
-        
-        
-        goal_constraints = constraint_table[0]
+        goal_constraints = constraint_table[0]                      # index 0 in the constraint table contains the goal locations and timesteps from when blocked
         if len(goal_constraints)>0:
             for j in range(len(goal_constraints)):
-                goalcon = goal_constraints[j]
+                goalcon = goal_constraints[j]                       #go over each goal constraint
                 
                 
-                if len(goalcon) == 4:
-                    if next_time >= goalcon['goaltime']:
-                        if goalcon['loc'][0] == next_loc:
-                            return True
+                if len(goalcon) == 4:                               # extra check if the key "goaltime" is added
+                    if next_time >= goalcon['goaltime']:            # check if the agent has already reached the goal
+                        if goalcon['loc'][0] == next_loc:           #and if the secondary agent wants to move to the reached goal
+                            return True                             # then it is constrained
                         else:
                             continue
-                        # goalcon['timestep'] = next_time
-                        # constraints.append(goalcon)
         
-        if len(constraint_table)>next_time:
+        #----------------- next check is to see if there is a constraint for next timestep, next location, or the move to the next location
+        if len(constraint_table)>next_time:                         # lenght of constraint table is the length of the highest timestep of the constraints
+                                                                    # if smaller: no more constraints to be checked
             constraints = constraint_table[next_time]
         else:
             constraints = []
         
         
-        if len(constraints) > 0:              #any constraint for this timestep?
-            for i in range(len(constraints)):   #loop over constraints
+        if len(constraints) > 0:                                    #any constraint for this timestep?
+            for i in range(len(constraints)):                       #loop over constraints
                 con = constraints[i]
                 
                     
-                if len(con['loc']) == 1:            #if vertex constraint
-                    if con['loc'][0] == next_loc:   # if location is constrained
+                if len(con['loc']) == 1:                            #if vertex constraint (format of  [(y,x)])
+                    if con['loc'][0] == next_loc:                   # if location is constrained
                         return True
                     else:
                         continue
-                if len(con['loc']) == 2:          #if edge constraint
-                    if con['loc'][0] == curr_loc and con['loc'][1] == next_loc: #if move from curr_loc to next_loc forbidden
+                if len(con['loc']) == 2:                            #if edge constraint, format of [(y1,x1), (y2,x2)])
+                    if con['loc'][0] == curr_loc and con['loc'][1] == next_loc: #if move from curr_loc to next_loc constrained
                         return True
                     else:
                         continue
@@ -147,12 +146,6 @@ def is_constrained(curr_loc, next_loc, next_time, constraint_table):
         else:
             return False
         
-        
-        
-    
-    # Task 1.2/1.3: Check if a move from curr_loc to next_loc at time step next_time violates
-    #               any given constraint. For efficiency the constraints are indexed in a constraint_table
-    #               by time step, see build_constraint_table.
 
 
 
@@ -199,31 +192,25 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
         #############################
         # Task 1.4: Adjust the goal test condition to handle goal constraints
         timestep = curr['timestep']
-        if curr['loc'] == goal_loc:
-            if timestep > len(constraint_table): #no more constraints after this time so easy shortcut
+        if curr['loc'] == goal_loc:                                                 #is this the goal location?
+            if timestep > len(constraint_table):                                    #no more constraints after this time so easy shortcut
                 return get_path(curr)
                 
             else:
                 con = 0
-                for i in range(timestep,len(constraint_table)):
+                for i in range(timestep,len(constraint_table)):                     # loop over constraint table at the goal location
                     if is_constrained(goal_loc, goal_loc, i, constraint_table):
-                        con += 1
-                if con ==0:  
+                        con += 1                                                    
+                if con ==0:                                                         #no future constraints at the goal location? then go there!
                     return get_path(curr)
                 else:
                     continue
-        
-            
-
-            
         
         # move and check constraints
         for dir in range(5):
             child_loc = move(curr['loc'], dir)
             
-  
-            
-            #is there a constraint?
+            #is there a constraint in the constraint table at the next time and next location? if yes then try another direction
             if is_constrained(curr['loc'], child_loc, curr['timestep']+1, constraint_table):  
                 continue
             
@@ -232,7 +219,7 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
             if child_loc[0] >= 0 and child_loc[1]>=0 and child_loc[0] < len(my_map):
                 if child_loc[1] < len(my_map[child_loc[0]]):
                     
-                    #check if vertex is not blocked
+                    #check if vertex is not blocked by an @
                     if my_map[child_loc[0]][child_loc[1]]:
                         continue
                 else:
@@ -250,6 +237,7 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints):
             # if location visited before:
             if (child['loc'], child['timestep']) in closed_list:
                 existing_node = closed_list[(child['loc'], child['timestep'])]
+                
                 # if visited before and path plus heuristic path shorter, then old node replaced by child
                 if compare_nodes(child, existing_node):
                     closed_list[(child['loc'], child['timestep'])] = child

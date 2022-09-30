@@ -29,14 +29,7 @@ class PrioritizedPlanningSolver(object):
         start_time = timer.time()
         result = []
         constraints = []
-        #constraints = [{'agent': 0, 'loc': [(1, 5)], 'timestep': 10},
-        #                {'agent': 0, 'loc': [(1, 4)], 'timestep': 3},
-        #                {'agent': 0, 'loc': [(1, 4)], 'timestep': 4},
-        #                {'agent': 0, 'loc': [(1, 4)], 'timestep': 5},
-        #                {'agent': 0, 'loc': [(1, 3)], 'timestep': 5},
-        #                {'agent': 0, 'loc': [(1, 3)], 'timestep': 3},
-        #                {'agent': 0, 'loc': [(1, 3)], 'timestep': 4},
-        #               {'agent': 0, 'loc': [(1,2), (1,3)], 'timestep': 2}]
+
 
         for i in range(self.num_of_agents):  # Find path for each agent
             path = a_star(self.my_map, self.starts[i], self.goals[i], self.heuristics[i],
@@ -54,19 +47,21 @@ class PrioritizedPlanningSolver(object):
 
             ##############################
             
+            #-------------------- begin of changed code-----------------------------------------------------------------------
             
-            for k in range(1,len(path)):
-                for l in range( self.num_of_agents):
-                    if l != i:
-                        constraints.append({'agent': l, 'loc': [path[k]], 'timestep': k})
+            for k in range(1,len(path)):            # loop over path to add path to constraints
+                for l in range( self.num_of_agents):        #loop over all the agents to add constraints
+                    if l != i:                              #dont add the path of the current agent to its own constraints
+                        constraints.append({'agent': l, 'loc': [path[k]], 'timestep': k})       #add vertices
                         if k > 1:
-                            constraints.append({'agent': l, 'loc': [path[k], path[k-1]], 'timestep': k})
+                            constraints.append({'agent': l, 'loc': [path[k], path[k-1]], 'timestep': k})    #add edges
             
+            #add the goal to the constraints[0], for using when the goal is reached to block the goal
             for l in range( self.num_of_agents):
                 if l != i:
-                    constraints.append({'agent': l, 'loc': [path[-1]], 'timestep': 0, 'goaltime': len(path)-1})
+                    constraints.append({'agent': l, 'loc': [path[-1]], 'timestep': 0, 'goaltime': len(path)-1})    
                     
-                
+            #-------------------- end of changed code-----------------------------------------------------------------------  
         self.CPU_time = timer.time() - start_time
 
         print("\n Found a solution! \n")
