@@ -25,7 +25,7 @@ def detect_collision(path1, path2):
         
         else:
             continue
-    return None
+    return None, None           #should this return none or something else??
 
 
 def detect_collisions(paths):
@@ -34,8 +34,21 @@ def detect_collisions(paths):
     #           A collision can be represented as dictionary that contains the id of the two robots, the vertex or edge
     #           causing the collision, and the timestep at which the collision occurred.
     #           You should use your detect_collision function to find a collision between two robots.
+    collisions = []
+    for i in range(len(paths)):
+        for j in range(len(paths)):
+            if i !=j:
+                collision = {}
+                coll, t = detect_collision(paths[i],paths[j])
+                collision['agent1'] = i
+                collision['agent2'] = j
+                if coll != None:
+                    collision['loc'],collision['timestep'] = coll,t
+                
+                    collisions.append(collision)
+                
 
-    pass
+    return collisions
 
 
 def standard_splitting(collision):
@@ -47,8 +60,16 @@ def standard_splitting(collision):
     #           Edge collision: the first constraint prevents the first agent to traverse the specified edge at the
     #                          specified timestep, and the second constraint prevents the second agent to traverse the
     #                          specified edge at the specified timestep
+    if len(collision) == 4:
+        loc = collision['loc']
+        if len(loc) == 2:
+            loc2 = loc.reverse()
+        else:
+            loc2 = loc
+        
+        return [{'agent': collision['agent1'], 'loc': loc, 'timestep': collision['timestep']}, 
+                {'agent': collision['agent2'], 'loc': loc2, 'timestep': collision['timestep']}]
 
-    pass
 
 
 def disjoint_splitting(collision):
@@ -135,7 +156,9 @@ class CBSSolver(object):
         # Task 3.2: Testing
         for collision in root['collisions']:
             print(standard_splitting(collision))
-
+        
+        
+        
         ##############################
         # Task 3.3: High-Level Search
         #           Repeat the following as long as the open list is not empty:
@@ -144,7 +167,14 @@ class CBSSolver(object):
         #             3. Otherwise, choose the first collision and convert to a list of constraints (using your
         #                standard_splitting function). Add a new child node to your open list for each constraint
         #           Ensure to create a copy of any objects that your child nodes might inherit
-
+        if len(self.open_list)>0:
+            
+            next_node = self.pop_node()
+            if len(next_node['collisions']) == 0:
+                return root['paths']
+            else:
+                constraints = standard_splitting(next_node['collisions'][0])
+                
         self.print_results(root)
         return root['paths']
 
