@@ -167,16 +167,34 @@ class CBSSolver(object):
         #             3. Otherwise, choose the first collision and convert to a list of constraints (using your
         #                standard_splitting function). Add a new child node to your open list for each constraint
         #           Ensure to create a copy of any objects that your child nodes might inherit
-        if len(self.open_list)>0:
+        while len(self.open_list)>0:
             
-            next_node = self.pop_node()
-            if len(next_node['collisions']) == 0:
-                return root['paths']
+            curr_node = self.pop_node()
+            if len(curr_node['collisions']) == 0:
+                return curr_node['paths'] #moet dit een return zijn?
             else:
-                constraints = standard_splitting(next_node['collisions'][0])
-                
-        self.print_results(root)
-        return root['paths']
+                constraints = standard_splitting(curr_node['collisions'][0])
+                for constraint in constraints:
+                    new_node = {}
+                    new_node['constraints'] = curr_node['constraints']
+                    new_node['constraints'].append(constraint)
+                    new_node['paths'] = curr_node['paths']
+                    for i in range(len(curr_node['paths'])):
+                        path = a_star(self.my_map, self.starts[i], self.goals[i], self.heuristics[i], i, new_node['constraints'])
+                    ``
+                        if path is None:
+                            raise BaseException('No solutions')
+                            
+                        if len(path)>0:
+                            new_node['paths'][i] = path
+                            new_node['collisions'] = detect_collisions(new_node['paths'])
+                            new_node['cost'] = get_sum_of_cost(new_node['paths'])
+                            push_node(new_node)
+                        
+                    
+                    
+        # self.print_results(root)
+        # return root['paths']
 
     def print_results(self, node):
         print("\n Found a solution! \n")
