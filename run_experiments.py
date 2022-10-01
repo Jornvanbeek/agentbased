@@ -20,7 +20,7 @@ from single_agent_planner import get_sum_of_cost
 # new
 defaultinstance = 'instances/exp2_2.txt'
 
-SOLVER = "Prioritized"
+SOLVER = "CBS"
 # SOLVER = 'Independent'
 
 
