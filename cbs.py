@@ -181,7 +181,7 @@ class CBSSolver(object):
                     new_node['paths'] = curr_node['paths']
                     for i in range(len(curr_node['paths'])):
                         path = a_star(self.my_map, self.starts[i], self.goals[i], self.heuristics[i], i, new_node['constraints'])
-                    ``
+                    
                         if path is None:
                             raise BaseException('No solutions')
                             
@@ -189,7 +189,7 @@ class CBSSolver(object):
                             new_node['paths'][i] = path
                             new_node['collisions'] = detect_collisions(new_node['paths'])
                             new_node['cost'] = get_sum_of_cost(new_node['paths'])
-                            push_node(new_node)
+                            self.push_node(new_node)
                         
                     
                     
