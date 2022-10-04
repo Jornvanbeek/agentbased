@@ -1,8 +1,4 @@
-"""
-Main file to run experiments and show animation.
 
-Note: To make the animation work in Spyder you should set graphics backend to 'Automatic' (Preferences > Graphics > Graphics Backend).
-"""
 
 #!/usr/bin/python
 import argparse

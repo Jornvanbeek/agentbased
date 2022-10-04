@@ -139,6 +139,8 @@ def is_constrained(curr_loc, next_loc, next_time, constraint_table):
                         return True
                     else:
                         continue
+                if len(con['loc']) == 0:                            # statement because of CBS, try to fix in CBS!!
+                    continue
                 else:
                     raise RuntimeError("length of given constraint is not 1 or 2! constraint: ", con)
             else:
