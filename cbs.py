@@ -11,21 +11,23 @@ def detect_collision(path1, path2):
     #           A vertex collision occurs if both robots occupy the same location at the same timestep
     #           An edge collision occurs if the robots swap their location at the same timestep.
     #           You should use "get_location(path, t)" to get the location of a robot at time t.
-    
+
     for t in range(min(len(path1), len(path2))):
-        
-        if get_location(path1,t) == get_location(path2,t):
+
+        if get_location(path1, t) == get_location(path2, t):
             print('vertex collision at t = ', t)
-            return [get_location(path1,t)],t
-        
+            return [get_location(path1, t)], t
+
         elif t > 0:
-            if get_location(path1,t-1) == get_location(path2, t) and get_location(path1,t) == get_location(path2,t-1):
+
+            if get_location(path2, t) == get_location(path1, t-1) and get_location(path1, t) == get_location(path2, t-1):
                 print('edge collision at t = ', t)
-                return [get_location(path1,t-1),get_location(path1,t)], t
-        
+                return [get_location(path1, t), get_location(path2, t)], t
+
+
         else:
             continue
-    return None, None           #should this return none or something else??
+    return None, None  # should this return none or something else??
 
 
 def detect_collisions(paths):
@@ -37,17 +39,16 @@ def detect_collisions(paths):
     collisions = []
     for i in range(len(paths)):
         for j in range(len(paths)):
-            if i !=j:
+            if i != j:
                 collision = {}
-                coll, t = detect_collision(paths[i],paths[j])
+                coll, t = detect_collision(paths[i], paths[j])
                 collision['agent1'] = i
                 collision['agent2'] = j
 
                 if coll != None:
-                    collision['loc'],collision['timestep'] = coll,t
-                
+                    collision['loc'], collision['timestep'] = coll, t
+
                     collisions.append(collision)
-                
 
     return collisions
 
@@ -63,6 +64,7 @@ def standard_splitting(collision):
     #                          specified edge at the specified timestep
     if len(collision) == 4:
         loc = collision['loc']
+
         
         loc2 = []
         if len(loc) == 2:
@@ -160,10 +162,12 @@ class CBSSolver(object):
 
         # Task 3.2: Testing
         for collision in root['collisions']:
+
             print("standard splitting collision: ", standard_splitting(collision))
         
         
         
+
         ##############################
         # Task 3.3: High-Level Search
         #           Repeat the following as long as the open list is not empty:
@@ -172,6 +176,7 @@ class CBSSolver(object):
         #             3. Otherwise, choose the first collision and convert to a list of constraints (using your
         #                standard_splitting function). Add a new child node to your open list for each constraint
         #           Ensure to create a copy of any objects that your child nodes might inherit
+
         new_node = {}
         
         while len(self.open_list)>0:
@@ -210,6 +215,7 @@ class CBSSolver(object):
                     
             return curr_node['paths']
                     
+
         # self.print_results(root)
         return "No solution"
 
