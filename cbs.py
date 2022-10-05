@@ -20,9 +20,9 @@ def detect_collision(path1, path2):
 
         elif t > 0:
 
-            if get_location(path2, t) == get_location(path1, t-1) and get_location(path1, t) == get_location(path2, t-1):
+            if get_location(path1,t-1) == get_location(path2, t) and get_location(path1,t) == get_location(path2,t-1):
                 print('edge collision at t = ', t)
-                return [get_location(path1, t), get_location(path2, t)], t
+                return [get_location(path1, t-1), get_location(path2, t-1)], t
 
 
         else:
@@ -38,7 +38,7 @@ def detect_collisions(paths):
     #           You should use your detect_collision function to find a collision between two robots.
     collisions = []
     for i in range(len(paths)):
-        for j in range(len(paths)):
+        for j in range(i,len(paths)):
             if i != j:
                 collision = {}
                 coll, t = detect_collision(paths[i], paths[j])
@@ -47,7 +47,6 @@ def detect_collisions(paths):
 
                 if coll != None:
                     collision['loc'], collision['timestep'] = coll, t
-
                     collisions.append(collision)
 
     return collisions
@@ -180,7 +179,7 @@ class CBSSolver(object):
         new_node = {}
         
         while len(self.open_list)>0:
-            for i in range(500):
+            for i in range(900):
                 curr_node = self.pop_node()
                 
                 if len(new_node) !=0:
@@ -190,29 +189,29 @@ class CBSSolver(object):
                 if len(curr_node['collisions']) == 0:
                     return curr_node['paths'] #moet dit een return zijn?
                 else:
-                    for j in range(len(curr_node['collisions'])):
-                        constraints = standard_splitting(curr_node['collisions'][j])
-                        for constraint in constraints:
-                            new_node = {}
-                            new_node['constraints'] = curr_node['constraints']
-                            if len(constraint['loc']) > 0:
-                                new_node['constraints'].append(constraint)
-                            new_node['paths'] = curr_node['paths']
-                            agent = constraint['agent']
-                            #for agent in range(len(curr_node['paths'])):
-                            path = a_star(self.my_map, self.starts[agent], self.goals[agent], self.heuristics[agent], agent, new_node['constraints'])
-                        
-                            if path is None:
-                                raise BaseException('No solutions')
-                                
-                            if len(path)>0:
-                                new_node['paths'][agent] = path
-                                new_node['collisions'] = detect_collisions(new_node['paths'])
-                                new_node['cost'] = get_sum_of_cost(new_node['paths'])
-                                
-                                self.push_node(new_node)
-                        
+                    # for j in range(len(curr_node['collisions'])):
+                    constraints = standard_splitting(curr_node['collisions'][0])
+                    for constraint in constraints:
+                        new_node = {}
+                        new_node['constraints'] = curr_node['constraints']
+                        if len(constraint['loc']) > 0:
+                            new_node['constraints'].append(constraint)
+                        new_node['paths'] = curr_node['paths']
+                        agent = constraint['agent']
+                        #for agent in range(len(curr_node['paths'])):
+                        path = a_star(self.my_map, self.starts[agent], self.goals[agent], self.heuristics[agent], agent, new_node['constraints'])
                     
+                        if path is None:
+                            raise BaseException('No solutions')
+                            
+                        if len(path)>0:
+                            new_node['paths'][agent] = path
+                            new_node['collisions'] = detect_collisions(new_node['paths'])
+                            new_node['cost'] = get_sum_of_cost(new_node['paths'])
+                            
+                            self.push_node(new_node)
+                        
+                   
             return curr_node['paths']
                     
 
