@@ -182,19 +182,20 @@ class CBSSolver(object):
             for i in range(900):
                 curr_node = self.pop_node()
                 
-                if len(new_node) !=0:
-                    if sum(curr_node['cost'])> sum(new_node['cost']):
-                        print('---------------non minimum cost!!')
+                # if len(new_node) !=0:
+                #     if sum(curr_node['cost'])> sum(new_node['cost']):
+                #         print('---------------non minimum cost!!')
                         
-                if len(curr_node['collisions']) == 0:
+                if len(detect_collisions(curr_node['paths'])) == 0:
                     return curr_node['paths'] #moet dit een return zijn?
                 else:
                     # for j in range(len(curr_node['collisions'])):
-                    constraints = standard_splitting(curr_node['collisions'][0])
+                    constraints = standard_splitting(detect_collisions(curr_node['paths'])[-1])
                     for constraint in constraints:
                         new_node = {}
                         new_node['constraints'] = curr_node['constraints']
                         if len(constraint['loc']) > 0:
+                            
                             new_node['constraints'].append(constraint)
                         new_node['paths'] = curr_node['paths']
                         agent = constraint['agent']
@@ -204,12 +205,15 @@ class CBSSolver(object):
                         if path is None:
                             raise BaseException('No solutions')
                             
-                        if len(path)>0:
-                            new_node['paths'][agent] = path
-                            new_node['collisions'] = detect_collisions(new_node['paths'])
-                            new_node['cost'] = get_sum_of_cost(new_node['paths'])
-                            
-                            self.push_node(new_node)
+
+                        new_node['paths'][agent] = path
+                        new_node['collisions'] = detect_collisions(new_node['paths'])
+                        if new_node['collisions'] == []:
+                            print('no collisions')
+                            # return(new_node['paths'])
+                        new_node['cost'] = sum(get_sum_of_cost(new_node['paths']))
+                        
+                        self.push_node(new_node)
                         
                    
             return curr_node['paths']
