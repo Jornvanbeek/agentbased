@@ -20,10 +20,9 @@ def detect_collision(path1, path2):
 
         elif t > 0:
 
-            if get_location(path1,t-1) == get_location(path2, t) and get_location(path1,t) == get_location(path2,t-1):
+            if get_location(path1, t-1) == get_location(path2, t) and get_location(path1, t) == get_location(path2, t-1):
                 print('edge collision at t = ', t)
                 return [get_location(path1, t-1), get_location(path2, t-1)], t
-
 
         else:
             continue
@@ -38,7 +37,7 @@ def detect_collisions(paths):
     #           You should use your detect_collision function to find a collision between two robots.
     collisions = []
     for i in range(len(paths)):
-        for j in range(i,len(paths)):
+        for j in range(i, len(paths)):
             if i != j:
                 collision = {}
                 coll, t = detect_collision(paths[i], paths[j])
@@ -64,18 +63,15 @@ def standard_splitting(collision):
     if len(collision) == 4:
         loc = collision['loc']
 
-        
         loc2 = []
         if len(loc) == 2:
             loc2.append(loc[1])
             loc2.append(loc[0])
 
-        
         if loc2 == None:
             print('loc2 = None')
-        return [{'agent': collision['agent1'], 'loc': loc, 'timestep': collision['timestep']}, 
+        return [{'agent': collision['agent1'], 'loc': loc, 'timestep': collision['timestep']},
                 {'agent': collision['agent2'], 'loc': loc2, 'timestep': collision['timestep']}]
-
 
 
 def disjoint_splitting(collision):
@@ -163,9 +159,6 @@ class CBSSolver(object):
         for collision in root['collisions']:
 
             print("standard splitting collision: ", standard_splitting(collision))
-        
-        
-        
 
         ##############################
         # Task 3.3: High-Level Search
@@ -177,17 +170,17 @@ class CBSSolver(object):
         #           Ensure to create a copy of any objects that your child nodes might inherit
 
         new_node = {}
-        
-        while len(self.open_list)>0:
+
+        while len(self.open_list) > 0:
             for i in range(900):
                 curr_node = self.pop_node()
-                
-                if len(new_node) !=0:
-                    if sum(curr_node['cost'])> sum(new_node['cost']):
+
+                if len(new_node) != 0:
+                    if sum(curr_node['cost']) > sum(new_node['cost']):
                         print('---------------non minimum cost!!')
-                        
+
                 if len(curr_node['collisions']) == 0:
-                    return curr_node['paths'] #moet dit een return zijn?
+                    return curr_node['paths']  # moet dit een return zijn?
                 else:
                     # for j in range(len(curr_node['collisions'])):
                     constraints = standard_splitting(curr_node['collisions'][0])
@@ -198,22 +191,21 @@ class CBSSolver(object):
                             new_node['constraints'].append(constraint)
                         new_node['paths'] = curr_node['paths']
                         agent = constraint['agent']
-                        #for agent in range(len(curr_node['paths'])):
-                        path = a_star(self.my_map, self.starts[agent], self.goals[agent], self.heuristics[agent], agent, new_node['constraints'])
-                    
+                        # for agent in range(len(curr_node['paths'])):
+                        path = a_star(self.my_map, self.starts[agent], self.goals[agent],
+                                      self.heuristics[agent], agent, new_node['constraints'])
+
                         if path is None:
                             raise BaseException('No solutions')
-                            
-                        if len(path)>0:
+
+                        if len(path) > 0:
                             new_node['paths'][agent] = path
                             new_node['collisions'] = detect_collisions(new_node['paths'])
                             new_node['cost'] = get_sum_of_cost(new_node['paths'])
-                            
+
                             self.push_node(new_node)
-                        
-                   
+
             return curr_node['paths']
-                    
 
         # self.print_results(root)
         return "No solution"
