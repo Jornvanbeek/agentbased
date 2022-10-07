@@ -16,7 +16,7 @@ def detect_collision(path1, path2):
 
         if get_location(path1, t) == get_location(path2, t):
             print('vertex collision at t = ', t)
-            return [get_location(path1, t)], t
+            return [get_location(path2, t)], t
 
         elif t > 0:
 
@@ -61,18 +61,19 @@ def standard_splitting(collision):
     #           Edge collision: the first constraint prevents the first agent to traverse the specified edge at the
     #                          specified timestep, and the second constraint prevents the second agent to traverse the
     #                          specified edge at the specified timestep
+    
     if len(collision) == 4:
         loc = collision['loc']
-
-        
         loc2 = []
+        
+        if len(loc) == 1:
+            loc2 = loc
+        
         if len(loc) == 2:
             loc2.append(loc[1])
             loc2.append(loc[0])
 
-        
-        if loc2 == None:
-            print('loc2 = None')
+
         return [{'agent': collision['agent1'], 'loc': loc, 'timestep': collision['timestep']}, 
                 {'agent': collision['agent2'], 'loc': loc2, 'timestep': collision['timestep']}]
 
@@ -152,7 +153,7 @@ class CBSSolver(object):
                 raise BaseException('No solutions')
             root['paths'].append(path)
 
-        root['cost'] = get_sum_of_cost(root['paths'])
+        root['cost'] = sum(get_sum_of_cost(root['paths']))
         root['collisions'] = detect_collisions(root['paths'])
         self.push_node(root)
 
@@ -179,7 +180,8 @@ class CBSSolver(object):
         new_node = {}
         
         while len(self.open_list)>0:
-            for i in range(900):
+            for i in range(50):
+                
                 curr_node = self.pop_node()
                 
                 # if len(new_node) !=0:
@@ -192,12 +194,15 @@ class CBSSolver(object):
                     # for j in range(len(curr_node['collisions'])):
                     constraints = standard_splitting(detect_collisions(curr_node['paths'])[-1])
                     for constraint in constraints:
+                        print("current collisions: ", detect_collisions(curr_node['paths']))
+                        print("current constraints: ", curr_node['constraints'])
                         new_node = {}
-                        new_node['constraints'] = curr_node['constraints']
-                        if len(constraint['loc']) > 0:
-                            
+                        new_node['constraints'] = curr_node['constraints'].copy()    # line 14 in pseudo code: need to add all the previous constraints?
+                        
+                        if constraint not in curr_node['constraints']:
                             new_node['constraints'].append(constraint)
-                        new_node['paths'] = curr_node['paths']
+                        print("new constraints: ", new_node['constraints'])
+                        new_node['paths'] = curr_node['paths'].copy()
                         agent = constraint['agent']
                         #for agent in range(len(curr_node['paths'])):
                         path = a_star(self.my_map, self.starts[agent], self.goals[agent], self.heuristics[agent], agent, new_node['constraints'])
@@ -216,11 +221,11 @@ class CBSSolver(object):
                         self.push_node(new_node)
                         
                    
-            return curr_node['paths']
+            return new_node['paths']
                     
 
         # self.print_results(root)
-        return "No solution"
+        # return "No solution"
 
     def print_results(self, node):
         print("\n Found a solution! \n")

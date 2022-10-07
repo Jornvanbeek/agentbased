@@ -18,6 +18,7 @@ defaultinstance = 'instances/test_29.txt'
 
 SOLVER = "CBS"
 # SOLVER = 'Independent'
+# batch = True
 
 
 def print_mapf_instance(my_map, starts, goals):
