@@ -26,6 +26,18 @@ def detect_collision(path1, path2):
 
         else:
             continue
+        
+    for k in range(min(len(path1), len(path2)), max(len(path1), len(path2))):
+        if len(path1)>len(path2):
+            if get_location(path1, k) == get_location(path2, t):
+                print('goal collision at t = ', k)
+                return [get_location(path1, k)], k
+        
+        elif len(path1)<len(path2):
+            if get_location(path1, t) == get_location(path2, k):
+                print('goal collision at t = ', k)
+                return [get_location(path2, k)], k
+    
     return None, None  # should this return none or something else??
 
 
@@ -174,7 +186,7 @@ class CBSSolver(object):
         new_node = {}
 
         while len(self.open_list) > 0:
-            for i in range(50):
+            for i in range(1000):
 
                 curr_node = self.pop_node()
 
@@ -186,7 +198,7 @@ class CBSSolver(object):
                     return curr_node['paths']  # moet dit een return zijn?
                 else:
                     # for j in range(len(curr_node['collisions'])):
-                    constraints = standard_splitting(detect_collisions(curr_node['paths'])[-1])
+                    constraints = standard_splitting(detect_collisions(curr_node['paths'])[0])
                     for constraint in constraints:
                         print("current collisions: ", detect_collisions(curr_node['paths']))
                         print("current constraints: ", curr_node['constraints'])

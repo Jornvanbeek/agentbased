@@ -14,7 +14,7 @@ from single_agent_planner import get_sum_of_cost
 # instance = open('instances/exp0.txt','r').read()
 
 # new
-defaultinstance = 'instances/test_29.txt'
+defaultinstance = 'instances/test_41.txt'
 
 SOLVER = "CBS"
 # SOLVER = 'Independent'
@@ -156,7 +156,7 @@ if __name__ == '__main__':
             raise RuntimeError("Unknown solver!")
 
         cost = get_sum_of_cost(paths)
-        result_file.write("{},{}\n".format(file, cost))
+        result_file.write("{},{},{}\n".format(file, cost, sum(cost)))
 
         if not args.batch:
             print("***Test paths on a simulation***")
