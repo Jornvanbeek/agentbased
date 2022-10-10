@@ -14,7 +14,7 @@ from single_agent_planner import get_sum_of_cost
 # instance = open('instances/exp0.txt','r').read()
 
 # new
-defaultinstance = 'instances/test_41.txt'
+defaultinstance = 'instances/test_47.txt'
 
 SOLVER = "CBS"
 # SOLVER = 'Independent'
@@ -136,7 +136,7 @@ if __name__ == '__main__':
         print_mapf_instance(my_map, starts, goals)
 
         if args.solver == "CBS":
-            print("***Run CBS***")
+            print("***Run CBS*** file: ", file)
             cbs = CBSSolver(my_map, starts, goals)
             paths = cbs.find_solution(args.disjoint)
         elif args.solver == "Independent":

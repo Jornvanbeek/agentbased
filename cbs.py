@@ -26,15 +26,16 @@ def detect_collision(path1, path2):
 
         else:
             continue
-        
-    for k in range(min(len(path1), len(path2)), max(len(path1), len(path2))):
+    
+    goal_timestep = min(len(path1), len(path2))-1
+    for k in range(goal_timestep, max(len(path1), len(path2))):
         if len(path1)>len(path2):
-            if get_location(path1, k) == get_location(path2, t):
+            if get_location(path1, k) == get_location(path2, goal_timestep):
                 print('goal collision at t = ', k)
                 return [get_location(path1, k)], k
         
         elif len(path1)<len(path2):
-            if get_location(path1, t) == get_location(path2, k):
+            if get_location(path1, goal_timestep) == get_location(path2, k):
                 print('goal collision at t = ', k)
                 return [get_location(path2, k)], k
     
@@ -86,6 +87,9 @@ def standard_splitting(collision):
 
         return [{'agent': collision['agent1'], 'loc': loc, 'timestep': collision['timestep']},
                 {'agent': collision['agent2'], 'loc': loc2, 'timestep': collision['timestep']}]
+    
+
+    
 
 
 def disjoint_splitting(collision):
@@ -186,7 +190,7 @@ class CBSSolver(object):
         new_node = {}
 
         while len(self.open_list) > 0:
-            for i in range(1000):
+            for i in range(20000):
 
                 curr_node = self.pop_node()
 
@@ -207,6 +211,7 @@ class CBSSolver(object):
                         new_node['constraints'] = curr_node['constraints'].copy()
 
                         if constraint not in curr_node['constraints']:
+                            #if self.goals[constraint['agent']] != constraint['loc'][0]:
                             new_node['constraints'].append(constraint)
                         print("new constraints: ", new_node['constraints'])
                         new_node['paths'] = curr_node['paths'].copy()
@@ -216,7 +221,7 @@ class CBSSolver(object):
                                       self.heuristics[agent], agent, new_node['constraints'])
 
                         if path is None:
-                            raise BaseException('No solutions')
+                            raise BaseException('No solutions, case:', )
 
                         new_node['paths'][agent] = path
                         new_node['collisions'] = detect_collisions(new_node['paths'])
