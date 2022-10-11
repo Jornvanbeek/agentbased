@@ -14,11 +14,11 @@ from single_agent_planner import get_sum_of_cost
 # instance = open('instances/exp0.txt','r').read()
 
 # new
-defaultinstance = 'instances/test_47.txt'
+defaultinstance = 'instances/test_*.txt'
 
 SOLVER = "CBS"
 # SOLVER = 'Independent'
-# batch = True
+batch = True
 
 
 def print_mapf_instance(my_map, starts, goals):

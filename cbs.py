@@ -5,49 +5,41 @@ from single_agent_planner import compute_heuristics, a_star, get_location, get_s
 
 
 def detect_collision(path1, path2):
-    ##############################
-    # Task 3.1: Return the first collision that occurs between two robot paths (or None if there is no collision)
-    #           There are two types of collisions: vertex collision and edge collision.
-    #           A vertex collision occurs if both robots occupy the same location at the same timestep
-    #           An edge collision occurs if the robots swap their location at the same timestep.
-    #           You should use "get_location(path, t)" to get the location of a robot at time t.
 
+    #normal constraints
     for t in range(min(len(path1), len(path2))):
 
         if get_location(path1, t) == get_location(path2, t):
-            print('vertex collision at t = ', t)
+            # print('vertex collision at t = ', t)
             return [get_location(path2, t)], t
 
         elif t > 0:
 
             if get_location(path1, t-1) == get_location(path2, t) and get_location(path1, t) == get_location(path2, t-1):
-                print('edge collision at t = ', t)
+                # print('edge collision at t = ', t)
                 return [get_location(path1, t-1), get_location(path2, t-1)], t
 
         else:
             continue
     
+    #goal constraints:
     goal_timestep = min(len(path1), len(path2))-1
     for k in range(goal_timestep, max(len(path1), len(path2))):
-        if len(path1)>len(path2):
+        if len(path1)>=len(path2):
             if get_location(path1, k) == get_location(path2, goal_timestep):
-                print('goal collision at t = ', k)
+                # print('goal collision at t = ', k)
                 return [get_location(path1, k)], k
         
         elif len(path1)<len(path2):
             if get_location(path1, goal_timestep) == get_location(path2, k):
-                print('goal collision at t = ', k)
+                # print('goal collision at t = ', k)
                 return [get_location(path2, k)], k
     
     return None, None  # should this return none or something else??
 
 
 def detect_collisions(paths):
-    ##############################
-    # Task 3.1: Return a list of first collisions between all robot pairs.
-    #           A collision can be represented as dictionary that contains the id of the two robots, the vertex or edge
-    #           causing the collision, and the timestep at which the collision occurred.
-    #           You should use your detect_collision function to find a collision between two robots.
+
     collisions = []
     for i in range(len(paths)):
         for j in range(i, len(paths)):
@@ -65,15 +57,6 @@ def detect_collisions(paths):
 
 
 def standard_splitting(collision):
-    ##############################
-    # Task 3.2: Return a list of (two) constraints to resolve the given collision
-    #           Vertex collision: the first constraint prevents the first agent to be at the specified location at the
-    #                            specified timestep, and the second constraint prevents the second agent to be at the
-    #                            specified location at the specified timestep.
-    #           Edge collision: the first constraint prevents the first agent to traverse the specified edge at the
-    #                          specified timestep, and the second constraint prevents the second agent to traverse the
-    #                          specified edge at the specified timestep
-
     if len(collision) == 4:
         loc = collision['loc']
         loc2 = []
@@ -133,12 +116,12 @@ class CBSSolver(object):
 
     def push_node(self, node):
         heapq.heappush(self.open_list, (node['cost'], len(node['collisions']), self.num_of_generated, node))
-        print("Generate node {}".format(self.num_of_generated))
+        # print("Generate node {}".format(self.num_of_generated))
         self.num_of_generated += 1
 
     def pop_node(self):
         _, _, id, node = heapq.heappop(self.open_list)
-        print("Expand node {}".format(id))
+        # print("Expand node {}".format(id))
         self.num_of_expanded += 1
         return node
 
@@ -150,15 +133,11 @@ class CBSSolver(object):
 
         self.start_time = timer.time()
 
-        # Generate the root node
-        # constraints   - list of constraints
-        # paths         - list of paths, one for each agent
-        #               [[(x11, y11), (x12, y12), ...], [(x21, y21), (x22, y22), ...], ...]
-        # collisions     - list of collisions in paths
         root = {'cost': 0,
                 'constraints': [],
                 'paths': [],
                 'collisions': []}
+        
         for i in range(self.num_of_agents):  # Find initial path for each agent
             path = a_star(self.my_map, self.starts[i], self.goals[i], self.heuristics[i],
                           i, root['constraints'])
@@ -170,72 +149,51 @@ class CBSSolver(object):
         root['collisions'] = detect_collisions(root['paths'])
         self.push_node(root)
 
-        # Task 3.1: Testing
-        print("root collisions: ", root['collisions'])
-
-        # Task 3.2: Testing
-        for collision in root['collisions']:
-
-            print("standard splitting collision: ", standard_splitting(collision))
-
-        ##############################
-        # Task 3.3: High-Level Search
-        #           Repeat the following as long as the open list is not empty:
-        #             1. Get the next node from the open list (you can use self.pop_node()
-        #             2. If this node has no collision, return solution
-        #             3. Otherwise, choose the first collision and convert to a list of constraints (using your
-        #                standard_splitting function). Add a new child node to your open list for each constraint
-        #           Ensure to create a copy of any objects that your child nodes might inherit
 
         new_node = {}
+        time = timer.time()
+        while len(self.open_list) > 0:                                          # open list should have entries
+            for i in range(400000):                                             # keep iterations within bounds
+                # if i <100:    
+                #     print(i)
+                    
+                if i%10000 == 0:
+                    print(i, ' timestep: ', timer.time()-time)
+                    time = timer.time()
+                curr_node = self.pop_node()                                     # pop node with lowest cost (and later least collisions)
 
-        while len(self.open_list) > 0:
-            for i in range(20000):
-
-                curr_node = self.pop_node()
-
-                # if len(new_node) !=0:
-                #     if sum(curr_node['cost'])> sum(new_node['cost']):
-                #         print('---------------non minimum cost!!')
-
-                if len(detect_collisions(curr_node['paths'])) == 0:
-                    return curr_node['paths']  # moet dit een return zijn?
+                if len(curr_node['collisions']) == 0:             # collision free? there's your answer
+                    print(i, " iterations")
+                    return curr_node['paths']  
                 else:
-                    # for j in range(len(curr_node['collisions'])):
-                    constraints = standard_splitting(detect_collisions(curr_node['paths'])[0])
-                    for constraint in constraints:
-                        print("current collisions: ", detect_collisions(curr_node['paths']))
-                        print("current constraints: ", curr_node['constraints'])
+                    constraints = standard_splitting(curr_node['collisions'][0]) #detect_collisions(curr_node['paths'])[0])      # get two new constraints
+                    for constraint in constraints:                              # loop over the two constraints and create new nodes
+                        
                         new_node = {}
-                        # line 14 in pseudo code: need to add all the previous constraints?
                         new_node['constraints'] = curr_node['constraints'].copy()
-
-                        if constraint not in curr_node['constraints']:
-                            #if self.goals[constraint['agent']] != constraint['loc'][0]:
-                            new_node['constraints'].append(constraint)
-                        print("new constraints: ", new_node['constraints'])
-                        new_node['paths'] = curr_node['paths'].copy()
                         agent = constraint['agent']
-                        # for agent in range(len(curr_node['paths'])):
+                        new_node['paths'] = curr_node['paths'].copy()           # copy parent
+                        # if constraint in curr_node['constraints']:
+                        #     print("found a double constraint: ", constraint)
+                        #if constraint not in curr_node['constraints']:          #check if the constraint is not yet in the constraints
+                        if len(curr_node['paths'][agent]) == 1 and self.goals[agent] == constraint['loc'][0] and constraint['agent'] == agent:
+                            continue #if an agent starts at its goal, and the new constraint is for its goal: dont add the constraint
+                        new_node['constraints'].append(constraint)          # add the new constraint
+
                         path = a_star(self.my_map, self.starts[agent], self.goals[agent],
-                                      self.heuristics[agent], agent, new_node['constraints'])
+                                      self.heuristics[agent], agent, new_node['constraints'])   #retreive new paths for agents with the new constraint
 
-                        if path is None:
-                            raise BaseException('No solutions, case:', )
+                        if path is None:                    
+                            raise BaseException('No solutions')                 #no solutions found
 
-                        new_node['paths'][agent] = path
-                        new_node['collisions'] = detect_collisions(new_node['paths'])
-                        if new_node['collisions'] == []:
-                            print('no collisions')
-                            # return(new_node['paths'])
-                        new_node['cost'] = sum(get_sum_of_cost(new_node['paths']))
+                        new_node['paths'][agent] = path                                     #replace old path by new   
+                        new_node['collisions'] = detect_collisions(new_node['paths'])       #what are the collisions?
+                        new_node['cost'] = sum(get_sum_of_cost(new_node['paths']))          #costs?
+                        self.push_node(new_node)                                            #add the new node to the open list
 
-                        self.push_node(new_node)
+            return curr_node['paths']                                                       #return if too much iterations have taken place: for debugging
 
-            return new_node['paths']
 
-        # self.print_results(root)
-        # return "No solution"
 
     def print_results(self, node):
         print("\n Found a solution! \n")
