@@ -5,7 +5,7 @@ Code in this file is just provided as guidance, you are free to deviate from it.
 """
 
 import time as timer
-from single_agent_planner import compute_heuristics, a_star, get_sum_of_cost
+from single_agent_planner import compute_heuristics, a_star, get_sum_of_cost, get_location
 from aircraft import AircraftDistributed
 from cbs import detect_collision, detect_collisions
 
@@ -24,7 +24,8 @@ class DistributedPlanningSolver(object):
         self.goals = goals
         self.num_of_agents = len(goals)
         self.heuristics = []
-        # T.B.D.
+        for goal in self.goals:
+            self.heuristics.append(compute_heuristics(my_map, goal))
 
     def find_solution(self):
         """
@@ -36,12 +37,39 @@ class DistributedPlanningSolver(object):
         # Initialize constants
         start_time = timer.time()
         result = []
+        agent_objects = []
         self.CPU_time = timer.time() - start_time
-
+        
+        radar = 5
+        timeradar = radar
         # Create agent objects with AircraftDistributed class
         for i in range(self.num_of_agents):
             newAgent = AircraftDistributed(self.my_map, self.starts[i], self.goals[i], self.heuristics[i], i)
+            result.append(newAgent.find_individual_solution())
+            agent_objects.append(newAgent)
+        
+        t_max = 15
+        t = 0
+        while t < t_max:
+            for agent in range(self.num_of_agents):
+                radar_loc = []
+                
+                for j in range(self.num_of_agents):
+                    agent_loc = []
+                    for k in range(t, t + timeradar):
+                        agent_loc.append(get_location(result[j],k))
+                    
+                    radar_loc.append(agent_loc)
+                agent_objects[agent].radar(radar_loc, radar)
+                   
+                        
+                        
+                    
 
+            t +=1
+
+                
+        
         # Print final output
         print("\n Found a solution! \n")
         print("CPU time (s):    {:.2f}".format(self.CPU_time))

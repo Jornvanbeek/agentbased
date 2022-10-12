@@ -156,11 +156,12 @@ class CBSSolver(object):
             for i in range(400000):                                             # keep iterations within bounds
                 # if i <100:    
                 #     print(i)
-                    
-                if i%10000 == 0:
-                    print(i, ' timestep: ', timer.time()-time)
-                    time = timer.time()
+                
                 curr_node = self.pop_node()                                     # pop node with lowest cost (and later least collisions)
+                if i%1000 == 0:
+                    print(i, ' timestep: ', timer.time()-time)
+                    print('cost: ', curr_node['cost'],' amount of collisions left: ', len(curr_node['collisions']))
+                    time = timer.time()
 
                 if len(curr_node['collisions']) == 0:             # collision free? there's your answer
                     print(i, " iterations")

@@ -14,11 +14,11 @@ from single_agent_planner import get_sum_of_cost
 # instance = open('instances/exp0.txt','r').read()
 
 # new
-defaultinstance = 'instances/test_*.txt'
+defaultinstance = 'instances/exp0.txt'
 
-SOLVER = "CBS"
+SOLVER = "Distributed"
 # SOLVER = 'Independent'
-batch = True
+#batch = True
 
 
 def print_mapf_instance(my_map, starts, goals):
@@ -150,7 +150,7 @@ if __name__ == '__main__':
         elif args.solver == "Distributed":  # Wrapper of distributed planning solver class
             print("***Run Distributed Planning***")
             # !!!TODO: add your own distributed planning implementation here.
-            solver = DistributedPlanningSolver(my_map, starts, goals, ...)
+            solver = DistributedPlanningSolver(my_map, starts, goals) #,....
             paths = solver.find_solution()
         else:
             raise RuntimeError("Unknown solver!")
