@@ -48,6 +48,8 @@ class DistributedPlanningSolver(object):
             result.append(newAgent.find_individual_solution())
             agent_objects.append(newAgent)
         
+        
+        
         t_max = 15
         t = 0
         while t < t_max:
@@ -61,11 +63,9 @@ class DistributedPlanningSolver(object):
                     
                     radar_loc.append(agent_loc)
                 agent_objects[agent].radar(radar_loc, radar)
-                   
-                        
-                        
-                    
-
+            
+            list_len = [len(i) for i in result]
+            t_max = max(list_len)
             t +=1
 
                 
