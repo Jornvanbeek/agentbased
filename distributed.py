@@ -6,7 +6,7 @@ Code in this file is just provided as guidance, you are free to deviate from it.
 
 import time as timer
 from single_agent_planner import compute_heuristics, a_star, get_sum_of_cost, get_location
-from aircraft import AircraftDistributed
+from aircraft import AircraftDistributed, returnradar, radar, timeradar
 from cbs import detect_collision, detect_collisions
 
 
@@ -40,13 +40,15 @@ class DistributedPlanningSolver(object):
         agent_objects = []
         self.CPU_time = timer.time() - start_time
         
-        radar = 5
-        timeradar = radar
+
         # Create agent objects with AircraftDistributed class
         for i in range(self.num_of_agents):
-            newAgent = AircraftDistributed(self.my_map, self.starts[i], self.goals[i], self.heuristics[i], i)
-            result.append(newAgent.find_individual_solution())
+            newAgent = AircraftDistributed(self.my_map, self.starts[i], self.goals[i], self.heuristics[i], i, [])
+            path = newAgent.find_individual_solution([])
+            #newAgent.path = path
+            result.append(path)
             agent_objects.append(newAgent)
+        
         
         
         
@@ -54,15 +56,19 @@ class DistributedPlanningSolver(object):
         t = 0
         while t < t_max:
             for agent in range(self.num_of_agents):
-                radar_loc = []
                 
-                for j in range(self.num_of_agents):
-                    agent_loc = []
-                    for k in range(t, t + timeradar):
-                        agent_loc.append(get_location(result[j],k))
+                
+                # for j in range(self.num_of_agents):
+                #     agent_loc = []
+                #     for k in range(t, t + timeradar):
+                #         agent_loc.append(get_location(result[j],k))
                     
-                    radar_loc.append(agent_loc)
-                agent_objects[agent].radar(radar_loc, radar)
+                #     radar_loc.append(agent_loc)
+                    
+                radar_loc = returnradar(agent, result, t, timeradar)
+                
+                
+                agent_objects[agent].radar(radar_loc, radar, agent_objects)
             
             list_len = [len(i) for i in result]
             t_max = max(list_len)
