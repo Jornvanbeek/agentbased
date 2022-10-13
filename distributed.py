@@ -39,7 +39,6 @@ class DistributedPlanningSolver(object):
         result = []
         agent_objects = []
         self.CPU_time = timer.time() - start_time
-        
 
         # Create agent objects with AircraftDistributed class
         for i in range(self.num_of_agents):
@@ -48,34 +47,27 @@ class DistributedPlanningSolver(object):
             #newAgent.path = path
             result.append(path)
             agent_objects.append(newAgent)
-        
-        
-        
-        
+
         t_max = 15
         t = 0
         while t < t_max:
             for agent in range(self.num_of_agents):
-                
-                
+
                 # for j in range(self.num_of_agents):
                 #     agent_loc = []
                 #     for k in range(t, t + timeradar):
                 #         agent_loc.append(get_location(result[j],k))
-                    
+
                 #     radar_loc.append(agent_loc)
-                    
+
                 radar_loc = returnradar(agent, result, t, timeradar)
-                
-                
+
                 agent_objects[agent].radar(radar_loc, radar, agent_objects)
-            
+
             list_len = [len(i) for i in result]
             t_max = max(list_len)
-            t +=1
+            t += 1
 
-                
-        
         # Print final output
         print("\n Found a solution! \n")
         print("CPU time (s):    {:.2f}".format(self.CPU_time))
