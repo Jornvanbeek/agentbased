@@ -24,6 +24,8 @@ def returnradar(agent, paths, time, timeradar=timeradar):
 
     for j in range(len(paths)):
         agent_loc = []
+        if type(time) == list:
+            print(time)
         for k in range(time, time + timeradar):
             agent_loc.append(get_location(paths[agent], k))
 
@@ -53,7 +55,7 @@ class AircraftDistributed(object):
         self.path = a_star(self.my_map, self.start, self.goal, self.heuristics, self.id, constraints)
         return self.path
 
-    def radar(self, radar_loc, radar_range, agent_objects):
+    def radar(self, radar_loc, radar_range, agent_objects,t):
         # for t in range(len(radar_loc[self.id])):
         for j in range(len(radar_loc)):
             second_agent = agent_objects[j]
@@ -74,12 +76,14 @@ class AircraftDistributed(object):
                         constraints.append(constraint)
                         constraint = constraint = {'agent': j, 'loc': coll[0], 'timestep': coll[-1]}
                         constraints.append(constraint)
-
-                        # if newpath self < newpath second:
-                        #     self.path = newpath self #a_star(self.my_map, self.start, self.goal, self.heuristics, self.id, constraints)
-                        # else:
-                        #     econd_agent.path = newpath second#a_star(self.my_map, self.start, self.goal, self.heuristics, self.id, constraints)
-
-                        # coll = detect_collision(self.path, radar_loc[j]) #adapt this to radar timesteps
+                        new_path = a_star(self.my_map, self.start, self.goal, self.heuristics, self.id, constraints)
+                        new_path_second = a_star(second_agent.my_map, second_agent.start, second_agent.goal, second_agent.heuristics, second_agent.id, constraints)
+                        
+                        if len(new_path + second_agent.path) <= len(self.path + new_path_second):
+                            self.path = new_path 
+                        else:
+                            second_agent.path = new_path_second
+                        new_radar = returnradar(self.id, [self.path, second_agent.path], t)
+                        coll = detect_collision(new_radar[0], new_radar[1]) #adapt this to radar timesteps
 
                     # change main paths here

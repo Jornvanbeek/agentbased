@@ -52,17 +52,11 @@ class DistributedPlanningSolver(object):
         t = 0
         while t < t_max:
             for agent in range(self.num_of_agents):
-
-                # for j in range(self.num_of_agents):
-                #     agent_loc = []
-                #     for k in range(t, t + timeradar):
-                #         agent_loc.append(get_location(result[j],k))
-
-                #     radar_loc.append(agent_loc)
+                
 
                 radar_loc = returnradar(agent, result, t, timeradar)
 
-                agent_objects[agent].radar(radar_loc, radar, agent_objects)
+                agent_objects[agent].radar(radar_loc, radar, agent_objects,t)
 
             list_len = [len(i) for i in result]
             t_max = max(list_len)
