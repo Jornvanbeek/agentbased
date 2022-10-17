@@ -8,7 +8,7 @@ import math
 from single_agent_planner import compute_heuristics, a_star, get_sum_of_cost, get_location
 from cbs import detect_collision, detect_collisions
 
-radar = 10
+radar = 5
 timeradar = radar
 
 
@@ -35,7 +35,7 @@ def returnradar(agent, paths, time, timeradar=timeradar):
 class AircraftDistributed(object):
     """Aircraft object to be used in the distributed planner."""
 
-    def __init__(self, my_map, start, goal, heuristics, agent_id, path):
+    def __init__(self, my_map, start, goal, heuristics, agent_id, path, constraints):
         """
         my_map   - list of lists specifying obstacle positions
         starts      - (x1, y1) start location
@@ -49,6 +49,7 @@ class AircraftDistributed(object):
         self.id = agent_id
         self.heuristics = heuristics
         self.path = path
+        self.constraints = constraints
 
     def find_individual_solution(self, constraints):
         self.path = a_star(self.my_map, self.start, self.goal, self.heuristics, self.id, constraints)
@@ -58,7 +59,7 @@ class AircraftDistributed(object):
         # for t in range(len(radar_loc[self.id])):
         for j in range(len(radar_loc)):
             second_agent = agent_objects[j]
-            constraints = []
+            #constraints = []
             if self.id != j:
                 if calc_distance(radar_loc[self.id], radar_loc[j], 0) > radar_range:
                     continue
@@ -71,8 +72,8 @@ class AircraftDistributed(object):
                               coll[-1], ' future collision should be resolved')
                         # resolve conflict here
                         
-                        constraint = {'agent': self.id, 'loc': coll[0], 'timestep': coll[-1]+t}
-                        constraints.append(constraint)
+                        constraint1 = [{'agent': self.id, 'loc': coll[0], 'timestep': coll[-1]+t}]
+                        #constraints.append(constraint)
                         
                         loc2 = []
                         
@@ -83,18 +84,29 @@ class AircraftDistributed(object):
                             loc2.append(coll[0][1])
                             loc2.append(coll[0][0])
                         
-                        constraint = {'agent': j, 'loc': loc2, 'timestep': coll[-1]+t}
-                        constraints.append(constraint)
+                        constraint2 = [{'agent': j, 'loc': loc2, 'timestep': coll[-1]+t}]
+                        #constraints.append(constraint)
                         
                         
                         
-                        new_path = self.path[:t] + a_star(self.my_map, self.path[t], self.goal, self.heuristics, self.id, constraints)
-                        new_path_second = second_agent.path[:t] + a_star(second_agent.my_map, second_agent.path[t], second_agent.goal, second_agent.heuristics, second_agent.id, constraints)
+                        new_path = self.path[:t] + a_star(self.my_map, self.path[t], self.goal, self.heuristics, self.id, self.constraints + constraint1, timestep = t)
+                        new_path_second = second_agent.path[:t] + a_star(second_agent.my_map, second_agent.path[t], second_agent.goal, second_agent.heuristics, second_agent.id, second_agent.constraints + constraint2)
                         
-                        if len(new_path + second_agent.path) <= len(self.path + new_path_second):
+                        temp_radar = returnradar(self.id, [new_path, new_path_second], t)
+                        temp_coll = detect_collision(temp_radar[0], temp_radar[1])
+                        if temp_coll[0] == None:
+                            self.path = new_path
+                            second_agent.path = new_path_second
+                            self.constraints = self.constraints + constraint1
+                            second_agent.constraints = second_agent.constraints + constraint2
+                        elif len(new_path + second_agent.path) <= len(self.path + new_path_second):
                             self.path = new_path 
+                            self.constraints = self.constraints + constraint1
+                        
+                        
                         else:
                             second_agent.path[t:] = new_path_second
+                            second_agent.constraints = second_agent.constraints + constraint2
                         new_radar = returnradar(self.id, [self.path, second_agent.path], t)
                         coll = detect_collision(new_radar[0], new_radar[1]) #adapt this to radar timesteps
 

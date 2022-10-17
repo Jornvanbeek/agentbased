@@ -14,7 +14,7 @@ from single_agent_planner import get_sum_of_cost
 # instance = open('instances/exp0.txt','r').read()
 
 # new
-defaultinstance = 'instances/exp0.txt'
+defaultinstance = 'instances/test_31.txt'
 
 SOLVER = "Distributed"
 # SOLVER = 'Independent'

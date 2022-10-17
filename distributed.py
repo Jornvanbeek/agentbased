@@ -42,13 +42,13 @@ class DistributedPlanningSolver(object):
 
         # Create agent objects with AircraftDistributed class
         for i in range(self.num_of_agents):
-            newAgent = AircraftDistributed(self.my_map, self.starts[i], self.goals[i], self.heuristics[i], i, [])
+            newAgent = AircraftDistributed(self.my_map, self.starts[i], self.goals[i], self.heuristics[i], i, [], [])
             path = newAgent.find_individual_solution([])
             #newAgent.path = path
             result.append(path)
             agent_objects.append(newAgent)
 
-        t_max = 15
+        t_max = 40
         t = 0
         while t < t_max:
             for agent in range(self.num_of_agents):
@@ -61,7 +61,11 @@ class DistributedPlanningSolver(object):
             list_len = [len(i) for i in result]
             t_max = max(list_len)
             t += 1
+        
+        for i in range(self.num_of_agents):
+            result[i] = agent_objects[i].path
 
+        
         # Print final output
         print("\n Found a solution! \n")
         print("CPU time (s):    {:.2f}".format(self.CPU_time))
