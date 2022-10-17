@@ -8,7 +8,7 @@ import math
 from single_agent_planner import compute_heuristics, a_star, get_sum_of_cost, get_location
 from cbs import detect_collision, detect_collisions
 
-radar = 5
+radar = 10
 timeradar = radar
 
 
@@ -24,10 +24,9 @@ def returnradar(agent, paths, time, timeradar=timeradar):
 
     for j in range(len(paths)):
         agent_loc = []
-        if type(time) == list:
-            print(time)
+
         for k in range(time, time + timeradar):
-            agent_loc.append(get_location(paths[agent], k))
+            agent_loc.append(get_location(paths[j], k))
 
         radar_loc.append(agent_loc)
     return radar_loc
@@ -71,19 +70,34 @@ class AircraftDistributed(object):
                         print("agent1: ", self.id, "agent2: ", j, "timesteps in the future: ",
                               coll[-1], ' future collision should be resolved')
                         # resolve conflict here
-                        constraint = {'agent': self.id, 'loc': coll[0], 'timestep': coll[-1]}
+                        
+                        constraint = {'agent': self.id, 'loc': coll[0], 'timestep': coll[-1]+t}
+                        constraints.append(constraint)
+                        
+                        loc2 = []
+                        
+                        if len(coll[0]) == 1:
+                            loc2 = coll[0]
 
+                        if len(coll[0]) == 2:
+                            loc2.append(coll[0][1])
+                            loc2.append(coll[0][0])
+                        
+                        constraint = {'agent': j, 'loc': loc2, 'timestep': coll[-1]+t}
                         constraints.append(constraint)
-                        constraint = constraint = {'agent': j, 'loc': coll[0], 'timestep': coll[-1]}
-                        constraints.append(constraint)
-                        new_path = a_star(self.my_map, self.start, self.goal, self.heuristics, self.id, constraints)
-                        new_path_second = a_star(second_agent.my_map, second_agent.start, second_agent.goal, second_agent.heuristics, second_agent.id, constraints)
+                        
+                        
+                        
+                        new_path = self.path[:t] + a_star(self.my_map, self.path[t], self.goal, self.heuristics, self.id, constraints)
+                        new_path_second = second_agent.path[:t] + a_star(second_agent.my_map, second_agent.path[t], second_agent.goal, second_agent.heuristics, second_agent.id, constraints)
                         
                         if len(new_path + second_agent.path) <= len(self.path + new_path_second):
                             self.path = new_path 
                         else:
-                            second_agent.path = new_path_second
+                            second_agent.path[t:] = new_path_second
                         new_radar = returnradar(self.id, [self.path, second_agent.path], t)
                         coll = detect_collision(new_radar[0], new_radar[1]) #adapt this to radar timesteps
 
                     # change main paths here
+                    
+                    # make constraints be part of the init to keep constraint with each agent

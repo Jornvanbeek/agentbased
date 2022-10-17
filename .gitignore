@@ -2,3 +2,4 @@ __pycache__/
 *.csv
 instances/
 results.csv
+*.json
