@@ -8,7 +8,7 @@ import math
 from single_agent_planner import compute_heuristics, a_star, get_sum_of_cost, get_location
 from cbs import detect_collision, detect_collisions
 
-radar = 6
+radar = 10
 timeradar = radar
 
 
@@ -98,7 +98,8 @@ class AircraftDistributed(object):
                             if future != None:
                                 new_path = self.path[:t] + future
                             else:
-                                continue
+                                new_path = self.path
+                                constraint1 = []
                         else:
                             new_path = self.path
                             constraint1 = []
@@ -109,7 +110,8 @@ class AircraftDistributed(object):
                             if second_future != None:
                                 new_path_second = second_agent.path[:t] + second_future
                             else:
-                                continue
+                                new_path_second = second_agent.path
+                                constraint2 = []
 
                         else:
                             new_path_second = second_agent.path
