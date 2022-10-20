@@ -92,7 +92,7 @@ class AircraftDistributed(object):
 
                         # constraints.append(constraint)
 
-                        if t <= len(self.path):
+                        if t < len(self.path):
                             future = a_star(self.my_map, self.path[t], self.goal, self.heuristics,
                                             self.id, self.constraints + constraint1, timestep=t)
                             if future != None:
@@ -103,7 +103,7 @@ class AircraftDistributed(object):
                             new_path = self.path
                             constraint1 = []
 
-                        if t <= len(second_agent.path):
+                        if t < len(second_agent.path):
                             second_future = a_star(
                                 second_agent.my_map, second_agent.path[t], second_agent.goal, second_agent.heuristics, second_agent.id, second_agent.constraints + constraint2, timestep=t)
                             if second_future != None:
