@@ -106,12 +106,12 @@ class AircraftDistributed(object):
                         else:
                             new_path_second = second_agent.path
                             constraint2 = []
-                        if self.id == 2 or second_agent.id == 2:
+                        if self.id == 0 or second_agent.id == 0:
                             print(self.id, self.path)
                             print(second_agent.id, second_agent.path)
                         temp_radar = returnradar(self.id, [new_path, new_path_second], t)
                         temp_coll = detect_collision(temp_radar[0], temp_radar[1])
-                        if temp_coll[0] == None and len(new_path+new_path_second) <= len(second_agent.path+new_path):
+                        if temp_coll[0] == None and len(new_path+new_path_second) <= len(second_agent.path+new_path) and len(new_path+new_path_second) <= len(self.path+new_path_second):
                             self.path = new_path
                             second_agent.path = new_path_second
                             self.constraints = self.constraints + constraint1
@@ -129,11 +129,11 @@ class AircraftDistributed(object):
                         new_radar = returnradar(self.id, [self.path, second_agent.path], t)
                         radar_loc[self.id] = new_radar[0]
                         radar_loc[j] = new_radar[1]
-                        if self.id == 2:
+                        if self.id == 0:
                             print(self.path)
                         con1 = self.constraints
                         con2 = second_agent.constraints
-                        if self.id == 2 or second_agent.id == 2:
+                        if self.id == 0 or second_agent.id == 0:
                             print(self.id, self.path)
                             print(second_agent.id, second_agent.path)
                         coll = detect_collision(new_radar[0], new_radar[1])  # adapt this to radar timesteps
