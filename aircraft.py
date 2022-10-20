@@ -57,13 +57,17 @@ class AircraftDistributed(object):
 
     def radar(self, radar_loc, radar_range, agent_objects,t):
         # for t in range(len(radar_loc[self.id])):
+        #self.constraints = []
+        
         for j in range(len(radar_loc)):
             second_agent = agent_objects[j]
+            #second_agent.constraints = []
             #constraints = []
             if self.id != j:
                 if calc_distance(radar_loc[self.id], radar_loc[j], 0) > radar_range:
                     continue
                 else:
+                    
                     coll = detect_collision(radar_loc[self.id], radar_loc[j])
 
                     while coll[0] != None:
@@ -88,26 +92,46 @@ class AircraftDistributed(object):
                         #constraints.append(constraint)
                         
                         
-                        
-                        new_path = self.path[:t] + a_star(self.my_map, self.path[t], self.goal, self.heuristics, self.id, self.constraints + constraint1, timestep = t)
-                        new_path_second = second_agent.path[:t] + a_star(second_agent.my_map, second_agent.path[t], second_agent.goal, second_agent.heuristics, second_agent.id, second_agent.constraints + constraint2)
-                        
+                        future = a_star(self.my_map, self.path[t], self.goal, self.heuristics, self.id, self.constraints + constraint1, timestep = t)
+                        if future != None:
+                            new_path = self.path[:t] + future
+                        else:
+                            new_path = self.path
+                            constraint1 = []
+                            
+                        second_future = a_star(second_agent.my_map, second_agent.path[t], second_agent.goal, second_agent.heuristics, second_agent.id, second_agent.constraints + constraint2, timestep = t)
+                        if second_future != None:
+                            new_path_second = second_agent.path[:t] + second_future
+                        else:
+                            new_path_second = second_agent.path
+                            constraint2 = []
+                        if self.id == 2:
+                            print(self.path)
+
                         temp_radar = returnradar(self.id, [new_path, new_path_second], t)
                         temp_coll = detect_collision(temp_radar[0], temp_radar[1])
+                        
                         if temp_coll[0] == None:
                             self.path = new_path
                             second_agent.path = new_path_second
                             self.constraints = self.constraints + constraint1
+                            print('both constraints')
                             second_agent.constraints = second_agent.constraints + constraint2
-                        elif len(new_path + second_agent.path) <= len(self.path + new_path_second):
+                        elif len(new_path + second_agent.path) <= len(self.path + new_path_second) and len(constraint1)>0:
                             self.path = new_path 
                             self.constraints = self.constraints + constraint1
+                            print('first agents constraint')
                         
                         
                         else:
-                            second_agent.path[t:] = new_path_second
+                            second_agent.path = new_path_second
                             second_agent.constraints = second_agent.constraints + constraint2
+                            print('else')
                         new_radar = returnradar(self.id, [self.path, second_agent.path], t)
+                        radar_loc[self.id] = new_radar[0]
+                        radar_loc[j] = new_radar[1]
+                        if self.id == 2:
+                            print(self.path)
                         coll = detect_collision(new_radar[0], new_radar[1]) #adapt this to radar timesteps
 
                     # change main paths here

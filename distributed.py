@@ -47,8 +47,9 @@ class DistributedPlanningSolver(object):
             #newAgent.path = path
             result.append(path)
             agent_objects.append(newAgent)
-
-        t_max = 40
+        list_len = [len(i) for i in result]
+        t_max = max(list_len)
+        
         t = 0
         while t < t_max:
             for agent in range(self.num_of_agents):
@@ -57,13 +58,13 @@ class DistributedPlanningSolver(object):
                 radar_loc = returnradar(agent, result, t, timeradar)
 
                 agent_objects[agent].radar(radar_loc, radar, agent_objects,t)
-
+                result[agent] = agent_objects[agent].path
             list_len = [len(i) for i in result]
             t_max = max(list_len)
             t += 1
         
-        for i in range(self.num_of_agents):
-            result[i] = agent_objects[i].path
+
+            
 
         
         # Print final output
