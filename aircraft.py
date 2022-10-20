@@ -90,10 +90,11 @@ class AircraftDistributed(object):
 
                         constraint2 = [{'agent': j, 'loc': loc2, 'timestep': coll[-1]+t}]
 
-                        #constraints.append(constraint)
-                        
+                        # constraints.append(constraint)
+
                         if t <= len(self.path):
-                            future = a_star(self.my_map, self.path[t], self.goal, self.heuristics, self.id, self.constraints + constraint1, timestep = t)
+                            future = a_star(self.my_map, self.path[t], self.goal, self.heuristics,
+                                            self.id, self.constraints + constraint1, timestep=t)
                             if future != None:
                                 new_path = self.path[:t] + future
                             else:
@@ -101,9 +102,10 @@ class AircraftDistributed(object):
                         else:
                             new_path = self.path
                             constraint1 = []
-                        
+
                         if t <= len(second_agent.path):
-                            second_future = a_star(second_agent.my_map, second_agent.path[t], second_agent.goal, second_agent.heuristics, second_agent.id, second_agent.constraints + constraint2, timestep = t)
+                            second_future = a_star(
+                                second_agent.my_map, second_agent.path[t], second_agent.goal, second_agent.heuristics, second_agent.id, second_agent.constraints + constraint2, timestep=t)
                             if second_future != None:
                                 new_path_second = second_agent.path[:t] + second_future
                             else:
@@ -112,9 +114,9 @@ class AircraftDistributed(object):
                         else:
                             new_path_second = second_agent.path
                             constraint2 = []
-                        if self.id == 0 or second_agent.id == 0:
-                            print(self.id, self.path)
-                            print(second_agent.id, second_agent.path)
+                        # if self.id == 0 or second_agent.id == 0:
+                        #     print(self.id, self.path)
+                        #     print(second_agent.id, second_agent.path)
                         temp_radar = returnradar(self.id, [new_path, new_path_second], t)
                         temp_coll = detect_collision(temp_radar[0], temp_radar[1])
                         if temp_coll[0] == None and len(new_path+new_path_second) <= len(second_agent.path+new_path) and len(new_path+new_path_second) <= len(self.path+new_path_second):
@@ -135,13 +137,13 @@ class AircraftDistributed(object):
                         new_radar = returnradar(self.id, [self.path, second_agent.path], t)
                         radar_loc[self.id] = new_radar[0]
                         radar_loc[j] = new_radar[1]
-                        if self.id == 0:
-                            print(self.path)
+                        # if self.id == 0:
+                        #     print(self.path)
                         con1 = self.constraints
                         con2 = second_agent.constraints
-                        if self.id == 0 or second_agent.id == 0:
-                            print(self.id, self.path)
-                            print(second_agent.id, second_agent.path)
+                        # if self.id == 0 or second_agent.id == 0:
+                        #     print(self.id, self.path)
+                        #     print(second_agent.id, second_agent.path)
                         coll = detect_collision(new_radar[0], new_radar[1])  # adapt this to radar timesteps
 
                     # change main paths here
