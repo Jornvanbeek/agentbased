@@ -8,7 +8,7 @@ import math
 from single_agent_planner import compute_heuristics, a_star, get_sum_of_cost, get_location
 from cbs import detect_collision, detect_collisions
 
-radar = 5
+radar = 6
 timeradar = radar
 
 
@@ -91,17 +91,22 @@ class AircraftDistributed(object):
                         constraint2 = [{'agent': j, 'loc': loc2, 'timestep': coll[-1]+t}]
                         #constraints.append(constraint)
                         
-                        
-                        future = a_star(self.my_map, self.path[t], self.goal, self.heuristics, self.id, self.constraints + constraint1, timestep = t)
-                        if future != None:
-                            new_path = self.path[:t] + future
+                        if t <= len(self.path):
+                            future = a_star(self.my_map, self.path[t], self.goal, self.heuristics, self.id, self.constraints + constraint1, timestep = t)
+                            if future != None:
+                                new_path = self.path[:t] + future
+                            else:
+                                continue
                         else:
                             new_path = self.path
                             constraint1 = []
-                            
-                        second_future = a_star(second_agent.my_map, second_agent.path[t], second_agent.goal, second_agent.heuristics, second_agent.id, second_agent.constraints + constraint2, timestep = t)
-                        if second_future != None:
-                            new_path_second = second_agent.path[:t] + second_future
+                        
+                        if t <= len(second_agent.path):
+                            second_future = a_star(second_agent.my_map, second_agent.path[t], second_agent.goal, second_agent.heuristics, second_agent.id, second_agent.constraints + constraint2, timestep = t)
+                            if second_future != None:
+                                new_path_second = second_agent.path[:t] + second_future
+                            else:
+                                continue
                         else:
                             new_path_second = second_agent.path
                             constraint2 = []
