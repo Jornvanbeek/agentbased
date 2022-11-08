@@ -10,15 +10,34 @@ from prioritized import PrioritizedPlanningSolver
 from distributed import DistributedPlanningSolver  # Placeholder for Distributed Planning
 from visualize import Animation
 from single_agent_planner import get_sum_of_cost
+import time as timer
 
 # instance = open('instances/exp0.txt','r').read()
 
 # new
-defaultinstance = 'instances/test_41.txt'
-
-SOLVER = "Distributed"
-# SOLVER = 'Independent'
+batch = False
 #batch = True
+
+solverlist = ["CBS", "Distributed"]
+defaultinstance = 'instances/test_26.txt'
+
+if batch == True:
+    defaultinstance = 'instances/test_*.txt'
+    solverlist = ["Distributed"]
+
+
+
+
+
+
+
+
+
+mincost = open("instances/min-sum-of-cost.csv", "r").read()
+mincost = mincost.split(",")
+
+starttime = timer.time()
+batch_cost = 0
 
 
 def print_mapf_instance(my_map, starts, goals):
@@ -112,55 +131,74 @@ def import_mapf_instance(filename):
     return my_map, starts, goals
 
 
-if __name__ == '__main__':
-    parser = argparse.ArgumentParser(description='Runs various MAPF algorithms')
-    parser.add_argument('--instance', type=str, default=defaultinstance,
-                        help='The name of the instance file(s)')
-    parser.add_argument('--batch', action='store_true', default=False,
-                        help='Use batch output instead of animation')
-    parser.add_argument('--disjoint', action='store_true', default=False,
-                        help='Use the disjoint splitting')
-    parser.add_argument('--solver', type=str, default=SOLVER,
-                        help='The solver to use (one of: {CBS,Independent,Prioritized}), defaults to ' + str(SOLVER))
-
-    args = parser.parse_args()
-    # Hint: Command line options can be added in Spyder by pressing CTRL + F6 > Command line options.
-    # In PyCharm, they can be added as parameters in the configuration.
-
-    result_file = open("results.csv", "w", buffering=1)
-
-    for file in sorted(glob.glob(args.instance)):
-
-        print("***Import an instance***")
-        my_map, starts, goals = import_mapf_instance(file)
-        print_mapf_instance(my_map, starts, goals)
-
-        if args.solver == "CBS":
-            print("***Run CBS*** file: ", file)
-            cbs = CBSSolver(my_map, starts, goals)
-            paths = cbs.find_solution(args.disjoint)
-        elif args.solver == "Independent":
-            print("***Run Independent***")
-            solver = IndependentSolver(my_map, starts, goals)
-            paths = solver.find_solution()
-        elif args.solver == "Prioritized":
-            print("***Run Prioritized***")
-            solver = PrioritizedPlanningSolver(my_map, starts, goals)
-            paths = solver.find_solution()
-        elif args.solver == "Distributed":  # Wrapper of distributed planning solver class
-            print("***Run Distributed Planning***")
-            # !!!TODO: add your own distributed planning implementation here.
-            solver = DistributedPlanningSolver(my_map, starts, goals)  # ,....
-            paths = solver.find_solution()
-        else:
-            raise RuntimeError("Unknown solver!")
-
-        cost = get_sum_of_cost(paths)
-        result_file.write("{},{},{}\n".format(file, cost, sum(cost)))
-
-        if not args.batch:
-            print("***Test paths on a simulation***")
-            animation = Animation(my_map, starts, goals, paths)
-            # animation.save("output.mp4", 1.0) # install ffmpeg package to use this option
-            animation.show()
-    result_file.close()
+for SOLVER in solverlist:
+    if __name__ == '__main__':
+        parser = argparse.ArgumentParser(description='Runs various MAPF algorithms')
+        parser.add_argument('--instance', type=str, default=defaultinstance,
+                            help='The name of the instance file(s)')
+        parser.add_argument('--batch', action='store_true', default=False,
+                            help='Use batch output instead of animation')
+        parser.add_argument('--disjoint', action='store_true', default=False,
+                            help='Use the disjoint splitting')
+        parser.add_argument('--solver', type=str, default=SOLVER,
+                            help='The solver to use (one of: {CBS,Independent,Prioritized}), defaults to ' + str(SOLVER))
+    
+        args = parser.parse_args()
+        # Hint: Command line options can be added in Spyder by pressing CTRL + F6 > Command line options.
+        # In PyCharm, they can be added as parameters in the configuration.
+    
+        result_file = open("results.csv", "w", buffering=1)
+    
+        for file in sorted(glob.glob(args.instance)):
+    
+            print("***Import an instance***")
+            my_map, starts, goals = import_mapf_instance(file)
+            print_mapf_instance(my_map, starts, goals)
+    
+            if args.solver == "CBS":
+                print("***Run CBS*** file: ", file)
+                cbs = CBSSolver(my_map, starts, goals)
+                paths = cbs.find_solution(args.disjoint)
+            elif args.solver == "Independent":
+                print("***Run Independent***")
+                solver = IndependentSolver(my_map, starts, goals)
+                paths = solver.find_solution()
+            elif args.solver == "Prioritized":
+                print("***Run Prioritized***")
+                solver = PrioritizedPlanningSolver(my_map, starts, goals)
+                paths = solver.find_solution()
+            elif args.solver == "Distributed":  # Wrapper of distributed planning solver class
+                print("***Run Distributed Planning***")
+                # !!!TODO: add your own distributed planning implementation here.
+                solver = DistributedPlanningSolver(my_map, starts, goals)  # ,....
+                paths = solver.find_solution()
+            else:
+                raise RuntimeError("Unknown solver!")
+    
+            cost = get_sum_of_cost(paths)
+            mincost_instance = int(mincost[mincost.index('\n'+file.replace("\\", "/"))+1])
+            result_file.write("{},{},{},{}\n".format(file, cost, sum(cost), sum(cost)-mincost_instance))
+            batch_cost += sum(cost)
+            
+    
+            if not batch:
+                print("***Test paths on a simulation***")
+                animation = Animation(my_map, starts, goals, paths)
+                # animation.save("output.mp4", 1.0) # install ffmpeg package to use this option
+                animation.show(solver = SOLVER, filename = file)
+        result_file.close()
+    print("cpu time overall:", timer.time()-starttime)
+    
+    
+    
+    if batch:
+        print("BATCH total difference between solutions and optimal: ", batch_cost-1850)
+        
+        
+    else:
+    
+        mincost_instance = int(mincost[mincost.index('\n'+defaultinstance)+1])
+        print("INDIVIDUAL difference between current solution and optimal: ",  sum(cost)-mincost_instance)
+        
+        
+        

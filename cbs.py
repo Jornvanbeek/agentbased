@@ -158,13 +158,14 @@ class CBSSolver(object):
                 #     print(i)
                 
                 curr_node = self.pop_node()                                     # pop node with lowest cost (and later least collisions)
-                if i%1000 == 0:
+                if i%1000 == 0 and i !=0:
                     print(i, ' timestep: ', timer.time()-time)
                     print('cost: ', curr_node['cost'],' amount of collisions left: ', len(curr_node['collisions']))
                     time = timer.time()
 
                 if len(curr_node['collisions']) == 0:             # collision free? there's your answer
-                    print(i, " iterations")
+                    print("no more collisions! ", i, " iterations")
+                    print('cost: ', curr_node['cost'])
                     return curr_node['paths']  
                 else:
                     constraints = standard_splitting(curr_node['collisions'][0]) #detect_collisions(curr_node['paths'])[0])      # get two new constraints
