@@ -17,11 +17,11 @@ from mapmaker import randommapmaker
 
 # new
 batch = False
-#batch = True
+# batch = True
 
 # "CBS",
 solverlist = ["Distributed"]
-defaultinstance = 'instances/test_41.txt'
+defaultinstance = 'instances/test_22.txt'
 
 #defaultinstance = 'instances/random.txt'
 

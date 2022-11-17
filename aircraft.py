@@ -40,24 +40,6 @@ def detect_stalemate(path1, path2, t):
         return False
 
 
-def detect_constraint(path1, path2, con):
-    # toevoegen edge constraint
-    try:
-        # print("path timestep: ", path2[con["timestep"]])
-        # print("constraint loc: ", con["loc"])
-        # print("path2: ", path2)
-        # print("constraint: ", con)
-        if path2[con["timestep"]] == con["loc"][0]:
-            # print("True")
-            return True
-        # elif path1[con["timestep"]-1] == path2[con["timestep"]] and path2[con["timestep"]-1] == path1[con["timestep"]]:
-        #     #     print("True")
-        #     return True
-    except:
-        # print("False")
-        return False
-
-
 class AircraftDistributed(object):
     """Aircraft object to be used in the distributed planner."""
 
