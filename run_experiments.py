@@ -21,7 +21,7 @@ batch = False
 
 # "CBS",
 solverlist = ["Distributed"]
-defaultinstance = 'instances/test_22.txt'
+defaultinstance = 'instances/test_25.txt'
 
 #defaultinstance = 'instances/random.txt'
 
@@ -166,15 +166,15 @@ for SOLVER in solverlist:
                 cbs = CBSSolver(my_map, starts, goals)
                 paths = cbs.find_solution(args.disjoint)
             elif args.solver == "Independent":
-                print("***Run Independent***")
+                print("***Run Independent*** file: ", file)
                 solver = IndependentSolver(my_map, starts, goals)
                 paths = solver.find_solution()
             elif args.solver == "Prioritized":
-                print("***Run Prioritized***")
+                print("***Run Prioritized*** file: ", file)
                 solver = PrioritizedPlanningSolver(my_map, starts, goals)
                 paths = solver.find_solution()
             elif args.solver == "Distributed":  # Wrapper of distributed planning solver class
-                print("***Run Distributed Planning***")
+                print("***Run Distributed Planning*** file: ", file)
                 # !!!TODO: add your own distributed planning implementation here.
                 solver = DistributedPlanningSolver(my_map, starts, goals)  # ,....
                 paths = solver.find_solution()
