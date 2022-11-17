@@ -59,9 +59,18 @@ class DistributedPlanningSolver(object):
 
                 agent_objects[agent].radar(radar_loc, radar, agent_objects,t)
                 result[agent] = agent_objects[agent].path
+            
             list_len = [len(i) for i in result]
-            t_max = max(list_len)
+            t_max = max(list_len)               #update t max as total time could be increased!Alpha_[0]'
             t += 1
+            
+            remaining_coll = detect_collisions(radar_loc)
+            if len(remaining_coll)>0:     # stay at the current timestep if there still are collisions that can be detected and run the iterations all over again
+            #     t += -1   
+                for coll in remaining_coll:
+                    if coll['timestep'] - t <1:
+                        t += -1
+                        continue    
         
 
             
@@ -72,7 +81,7 @@ class DistributedPlanningSolver(object):
         print("CPU time (s):    {:.2f}".format(self.CPU_time))
         # Hint: think about how cost is defined in your implementation
         print("Sum of costs:    {}".format(get_sum_of_cost(result)))
-        print(result)
+        #print(result)
 
         # Hint: this should be the final result of the distributed planning (visualization is done after planning)
         return result

@@ -77,7 +77,7 @@ class Animation:
     def save(self, file_name, speed):
         self.animation.save(
             file_name,
-            fps=10 * speed,
+            fps=60 * speed,
             dpi=200,
             savefig_kwargs={"pad_inches": 0, "bbox_inches": "tight"})
 
@@ -97,7 +97,7 @@ class Animation:
 
     def animate_func(self, t):
         for k in range(len(self.paths)):
-            pos = self.get_state(t / 10, self.paths[k])
+            pos = self.get_state(t / 5, self.paths[k])
             self.agents[k].center = (pos[0], pos[1])
             self.agent_names[k].set_position((pos[0], pos[1] + 0.5))
 
@@ -116,7 +116,7 @@ class Animation:
                 if np.linalg.norm(pos1 - pos2) < 0.7:
                     d1.set_facecolor('red')
                     d2.set_facecolor('red')
-                    print("COLLISION! (agent-agent) ({}, {}) at time {}".format(i, j, t/10))
+                    print("COLLISION! (agent-agent) ({}, {}) at time {}".format(i, j, t/5))
 
         return self.patches + self.artists
 

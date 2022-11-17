@@ -11,6 +11,7 @@ from distributed import DistributedPlanningSolver  # Placeholder for Distributed
 from visualize import Animation
 from single_agent_planner import get_sum_of_cost
 import time as timer
+from mapmaker import randommapmaker
 
 # instance = open('instances/exp0.txt','r').read()
 
@@ -18,15 +19,21 @@ import time as timer
 batch = False
 #batch = True
 
-solverlist = ["CBS", "Distributed"]
-defaultinstance = 'instances/test_26.txt'
+# "CBS",
+solverlist = [ "Distributed"]
+defaultinstance = 'instances/test_47.txt'
+
+#defaultinstance = 'instances/random.txt'
 
 if batch == True:
     defaultinstance = 'instances/test_*.txt'
     solverlist = ["Distributed"]
 
 
-
+n_agents = 30
+grid_y = 10
+grid_x = 22
+n_obstacles = 25
 
 
 
@@ -77,7 +84,7 @@ def print_locations(my_map, locations):
     print(to_print)
 
 
-def import_mapf_instance(filename):
+def import_mapf_instance(filename, n_agents = n_agents, grid_y = grid_y, grid_x = grid_x, n_obstacles = n_obstacles):
     """
     Imports mapf instance from instances folder. Expects input as a .txt file in the following format:
         Line1: #rows #columns (number of rows and columns)
@@ -97,6 +104,10 @@ def import_mapf_instance(filename):
         1 1 1 5         # agent 1 starts at (1,1) and has (1,5) as goal
         1 2 1 4         # agent 2 starts at (1,2) and has (1,4) as goal
     """
+    if filename == 'instances/random.txt':
+        return randommapmaker(n_agents, grid_y, grid_x, n_obstacles)
+        
+    
     f = Path(filename)
     if not f.is_file():
         raise BaseException(filename + " does not exist.")
@@ -176,8 +187,11 @@ for SOLVER in solverlist:
                 raise RuntimeError("Unknown solver!")
     
             cost = get_sum_of_cost(paths)
-            mincost_instance = int(mincost[mincost.index('\n'+file.replace("\\", "/"))+1])
-            result_file.write("{},{},{},{}\n".format(file, cost, sum(cost), sum(cost)-mincost_instance))
+            if file[10] == 't':
+                mincost_instance = int(mincost[mincost.index('\n'+file.replace("\\", "/"))+1])
+                result_file.write("{},{},{},{}\n".format(file, cost, sum(cost), sum(cost)-mincost_instance))
+            else:
+                result_file.write("{},{},{}\n".format(file, cost, sum(cost)))
             batch_cost += sum(cost)
             
     
@@ -195,10 +209,11 @@ for SOLVER in solverlist:
         print("BATCH total difference between solutions and optimal: ", batch_cost-1850)
         
         
-    else:
+    elif len(defaultinstance) > 10: 
+        if defaultinstance[10] == 't':
     
-        mincost_instance = int(mincost[mincost.index('\n'+defaultinstance)+1])
-        print("INDIVIDUAL difference between current solution and optimal: ",  sum(cost)-mincost_instance)
-        
-        
+            mincost_instance = int(mincost[mincost.index('\n'+defaultinstance)+1])
+            print("INDIVIDUAL difference between current solution and optimal: ",  sum(cost)-mincost_instance)
+            
+            
         

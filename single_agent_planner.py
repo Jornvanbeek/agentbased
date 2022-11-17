@@ -35,7 +35,11 @@ def compute_heuristics(my_map, goal):
     closed_list = dict()
     root = {'loc': goal, 'cost': 0}
     heapq.heappush(open_list, (root['cost'], goal, root))
-    closed_list[goal] = root
+
+    try:
+        closed_list[goal] = root
+    except:
+        print('goal at heuristics is wrong')
     while len(open_list) > 0:
         (cost, loc, curr) = heapq.heappop(open_list)
         for dir in range(5):
