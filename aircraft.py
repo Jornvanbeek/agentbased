@@ -8,7 +8,7 @@ import math
 from single_agent_planner import compute_heuristics, a_star, get_sum_of_cost, get_location
 from cbs import detect_collision, detect_collisions
 
-radar = 20
+radar = 6
 timeradar = radar
 
 
@@ -34,7 +34,11 @@ def returnradar(agent, paths, time, timeradar=timeradar):
 def detect_stalemate(path1, path2, t):
     
     if path1[t-1] == path1[t] and path2[t-1] == path2[t]:
-        return True
+        try:
+            if path1[t+1]!= path1[t] or path2[t+1] != path2[t]:
+                return False
+        except:
+            return True
     else:
         return False
     
@@ -169,7 +173,7 @@ class AircraftDistributed(object):
                             second_agent.constraints = second_agent.constraints + constraint2
                             #print('else')
                             
-                        elif len(constraint1) > 1:        # and t < len(self.path)
+                        elif len(constraint1) > 0:   #!!! this was 1 but changed it to 0     # and t < len(self.path)
                             self.path = new_path
                             self.constraints = self.constraints + constraint1
                             #print('first agents constraint')
