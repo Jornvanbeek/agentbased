@@ -17,11 +17,11 @@ from mapmaker import randommapmaker
 
 # new
 batch = False
-#batch = True
+# batch = True
 
 # "CBS",
-solverlist = [ "Distributed"]
-defaultinstance = 'instances/test_47.txt'
+solverlist = ["Distributed"]
+defaultinstance = 'instances/test_22.txt'
 
 #defaultinstance = 'instances/random.txt'
 
@@ -34,10 +34,6 @@ n_agents = 30
 grid_y = 10
 grid_x = 22
 n_obstacles = 25
-
-
-
-
 
 
 mincost = open("instances/min-sum-of-cost.csv", "r").read()
@@ -84,7 +80,7 @@ def print_locations(my_map, locations):
     print(to_print)
 
 
-def import_mapf_instance(filename, n_agents = n_agents, grid_y = grid_y, grid_x = grid_x, n_obstacles = n_obstacles):
+def import_mapf_instance(filename, n_agents=n_agents, grid_y=grid_y, grid_x=grid_x, n_obstacles=n_obstacles):
     """
     Imports mapf instance from instances folder. Expects input as a .txt file in the following format:
         Line1: #rows #columns (number of rows and columns)
@@ -106,8 +102,7 @@ def import_mapf_instance(filename, n_agents = n_agents, grid_y = grid_y, grid_x 
     """
     if filename == 'instances/random.txt':
         return randommapmaker(n_agents, grid_y, grid_x, n_obstacles)
-        
-    
+
     f = Path(filename)
     if not f.is_file():
         raise BaseException(filename + " does not exist.")
@@ -153,19 +148,19 @@ for SOLVER in solverlist:
                             help='Use the disjoint splitting')
         parser.add_argument('--solver', type=str, default=SOLVER,
                             help='The solver to use (one of: {CBS,Independent,Prioritized}), defaults to ' + str(SOLVER))
-    
+
         args = parser.parse_args()
         # Hint: Command line options can be added in Spyder by pressing CTRL + F6 > Command line options.
         # In PyCharm, they can be added as parameters in the configuration.
-    
+
         result_file = open("results.csv", "w", buffering=1)
-    
+
         for file in sorted(glob.glob(args.instance)):
-    
+
             print("***Import an instance***")
             my_map, starts, goals = import_mapf_instance(file)
             print_mapf_instance(my_map, starts, goals)
-    
+
             if args.solver == "CBS":
                 print("***Run CBS*** file: ", file)
                 cbs = CBSSolver(my_map, starts, goals)
@@ -185,7 +180,7 @@ for SOLVER in solverlist:
                 paths = solver.find_solution()
             else:
                 raise RuntimeError("Unknown solver!")
-    
+
             cost = get_sum_of_cost(paths)
             if file[10] == 't':
                 mincost_instance = int(mincost[mincost.index('\n'+file.replace("\\", "/"))+1])
@@ -193,27 +188,20 @@ for SOLVER in solverlist:
             else:
                 result_file.write("{},{},{}\n".format(file, cost, sum(cost)))
             batch_cost += sum(cost)
-            
-    
+
             if not batch:
                 print("***Test paths on a simulation***")
                 animation = Animation(my_map, starts, goals, paths)
                 # animation.save("output.mp4", 1.0) # install ffmpeg package to use this option
-                animation.show(solver = SOLVER, filename = file)
+                animation.show(solver=SOLVER, filename=file)
         result_file.close()
     print("cpu time overall:", timer.time()-starttime)
-    
-    
-    
+
     if batch:
         print("BATCH total difference between solutions and optimal: ", batch_cost-1850)
-        
-        
-    elif len(defaultinstance) > 10: 
+
+    elif len(defaultinstance) > 10:
         if defaultinstance[10] == 't':
-    
+
             mincost_instance = int(mincost[mincost.index('\n'+defaultinstance)+1])
             print("INDIVIDUAL difference between current solution and optimal: ",  sum(cost)-mincost_instance)
-            
-            
-        
