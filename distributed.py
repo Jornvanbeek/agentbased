@@ -50,7 +50,6 @@ class DistributedPlanningSolver(object):
         list_len = [len(i) for i in result]
         t_max = max(list_len)
 
-
         t = 0
 
         while t < t_max:
@@ -63,6 +62,7 @@ class DistributedPlanningSolver(object):
 
                     agent_objects[agent].radar(radar_loc, radar, agent_objects, t)
                     result[agent] = agent_objects[agent].path
+
 
 
                 
@@ -85,7 +85,6 @@ class DistributedPlanningSolver(object):
             list_len = [len(i) for i in result]
             t_max = max(list_len) 
             
-
 
         # Print final output
         print("\n Found a solution! \n")
