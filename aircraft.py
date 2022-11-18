@@ -8,7 +8,7 @@ import math
 from single_agent_planner import compute_heuristics, a_star, get_sum_of_cost, get_location
 from cbs import detect_collision, detect_collisions
 
-radar =9
+radar = 9
 timeradar = radar
 
 
@@ -67,7 +67,7 @@ class AircraftDistributed(object):
     def radar(self, radar_loc, radar_range, agent_objects, t):
 
         for constraint in self.constraints:
-            
+
             if t == constraint["timestep"]-1:
                 third_agent = agent_objects[constraint["constrained_by"]]
 
@@ -104,12 +104,9 @@ class AircraftDistributed(object):
                     while coll[0] != None and self.it < 200:
                         self.it += 1
 
- 
-                        
                         if self.it < 10 or self.it % 100 == 0:
                             print(self.it, "iterations")
                             print("agent1: ", self.id, "agent2: ", j, "timesteps in the future: ", coll[-1])
-                   
 
                         constraint1 = [{'agent': self.id, 'constrained_by': j, 'loc': coll[0], 'timestep': coll[-1]+t}]
 
@@ -183,19 +180,19 @@ class AircraftDistributed(object):
                             #print('both constraints')
                             second_agent.constraints = second_agent.constraints + constraint2
                         # and t<len(self.path):
-                        elif len(new_path + second_agent.path) <= len(self.path + new_path_second)  and len(constraint1) > 0 and not detect_stalemate(temp_radar[0], radar_loc[j], coll[-1]):
+                        elif len(new_path + second_agent.path) <= len(self.path + new_path_second) and len(constraint1) > 0 and not detect_stalemate(temp_radar[0], radar_loc[j], coll[-1]):
                             self.path = new_path
                             self.constraints = self.constraints + constraint1
                             #print('first agents constraint')
 
                         # and t < len(second_agent.path):
-                        elif len(constraint2) > 0  and not detect_stalemate(radar_loc[self.id], temp_radar[1], coll[-1]):
+                        elif len(constraint2) > 0 and not detect_stalemate(radar_loc[self.id], temp_radar[1], coll[-1]):
                             second_agent.path = new_path_second
                             second_agent.constraints = second_agent.constraints + constraint2
 
-                            #print('else')
-                            
-                        elif len(constraint1) > 0:   #!!! this was 1 but changed it to 0     # and t < len(self.path)
+                            # print('else')
+
+                        elif len(constraint1) > 0:  # !!! this was 1 but changed it to 0     # and t < len(self.path)
 
                             self.path = new_path
                             self.constraints = self.constraints + constraint1
@@ -210,5 +207,4 @@ class AircraftDistributed(object):
                         con1 = self.constraints
                         con2 = second_agent.constraints
 
-                        coll = detect_collision(new_radar[0], new_radar[1])  
-
+                        coll = detect_collision(new_radar[0], new_radar[1])
