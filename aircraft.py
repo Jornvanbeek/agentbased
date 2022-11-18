@@ -68,8 +68,10 @@ class AircraftDistributed(object):
 
         for constraint in self.constraints:
 
+
             
             if t == constraint["timestep"]-1 or t == constraint["timestep"]-2:
+
 
                 third_agent = agent_objects[constraint["constrained_by"]]
 
