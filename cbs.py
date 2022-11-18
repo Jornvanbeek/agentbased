@@ -8,15 +8,12 @@ def detect_collision(path1, path2):
 
     #normal constraints
     for t in range(min(len(path1), len(path2))):
-
+        
         if get_location(path1, t) == get_location(path2, t):
-            # print('vertex collision at t = ', t)
             return [get_location(path2, t)], t
 
         elif t > 0:
-
             if get_location(path1, t-1) == get_location(path2, t) and get_location(path1, t) == get_location(path2, t-1):
-                # print('edge collision at t = ', t)
                 return [get_location(path1, t-1), get_location(path2, t-1)], t
 
         else:
@@ -24,18 +21,19 @@ def detect_collision(path1, path2):
     
     #goal constraints:
     goal_timestep = min(len(path1), len(path2))-1
+    
     for k in range(goal_timestep, max(len(path1), len(path2))):
+        
         if len(path1)>=len(path2):
             if get_location(path1, k) == get_location(path2, goal_timestep):
-                # print('goal collision at t = ', k)
                 return [get_location(path1, k)], k
         
         elif len(path1)<len(path2):
             if get_location(path1, goal_timestep) == get_location(path2, k):
-                # print('goal collision at t = ', k)
+
                 return [get_location(path2, k)], k
     
-    return None, None  # should this return none or something else??
+    return None, None  
 
 
 def detect_collisions(paths):
@@ -43,6 +41,7 @@ def detect_collisions(paths):
     collisions = []
     for i in range(len(paths)):
         for j in range(i, len(paths)):
+            
             if i != j:
                 collision = {}
                 coll, t = detect_collision(paths[i], paths[j])
@@ -70,24 +69,6 @@ def standard_splitting(collision):
 
         return [{'agent': collision['agent1'], 'loc': loc, 'timestep': collision['timestep']},
                 {'agent': collision['agent2'], 'loc': loc2, 'timestep': collision['timestep']}]
-    
-
-    
-
-
-def disjoint_splitting(collision):
-    ##############################
-    # Task 4.1: Return a list of (two) constraints to resolve the given collision
-    #           Vertex collision: the first constraint enforces one agent to be at the specified location at the
-    #                            specified timestep, and the second constraint prevents the same agent to be at the
-    #                            same location at the timestep.
-    #           Edge collision: the first constraint enforces one agent to traverse the specified edge at the
-    #                          specified timestep, and the second constraint prevents the same agent to traverse the
-    #                          specified edge at the specified timestep
-    #           Choose the agent randomly
-
-    pass
-
 
 class CBSSolver(object):
     """The high-level search of CBS."""
@@ -116,12 +97,10 @@ class CBSSolver(object):
 
     def push_node(self, node):
         heapq.heappush(self.open_list, (node['cost'], len(node['collisions']), self.num_of_generated, node))
-        # print("Generate node {}".format(self.num_of_generated))
         self.num_of_generated += 1
 
     def pop_node(self):
         _, _, id, node = heapq.heappop(self.open_list)
-        # print("Expand node {}".format(id))
         self.num_of_expanded += 1
         return node
 
@@ -154,9 +133,7 @@ class CBSSolver(object):
         time = timer.time()
         while len(self.open_list) > 0:                                          # open list should have entries
             for i in range(400000):                                             # keep iterations within bounds
-                # if i <100:    
-                #     print(i)
-                
+
                 curr_node = self.pop_node()                                     # pop node with lowest cost (and later least collisions)
                 if i%1000 == 0 and i !=0:
                     print(i, ' timestep: ', timer.time()-time)
@@ -175,9 +152,7 @@ class CBSSolver(object):
                         new_node['constraints'] = curr_node['constraints'].copy()
                         agent = constraint['agent']
                         new_node['paths'] = curr_node['paths'].copy()           # copy parent
-                        # if constraint in curr_node['constraints']:
-                        #     print("found a double constraint: ", constraint)
-                        #if constraint not in curr_node['constraints']:          #check if the constraint is not yet in the constraints
+
                         if len(curr_node['paths'][agent]) == 1 and self.goals[agent] == constraint['loc'][0] and constraint['agent'] == agent:
                             continue #if an agent starts at its goal, and the new constraint is for its goal: dont add the constraint
                         new_node['constraints'].append(constraint)          # add the new constraint

@@ -92,9 +92,9 @@ def randommapmaker(n_agents, grid_y, grid_x, n_obstacles):
         std_starts.append([i,22])
         std_goals.append([len(my_map)-i, 1])
     
-    std_loc = False
+    std_loc = True
     std_map = False
-    #std_map = 3
+    std_map = 2
     
     if std_map != False:
         filename = 'instances/layout'+str(std_map)+'.txt'

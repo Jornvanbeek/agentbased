@@ -50,28 +50,46 @@ class DistributedPlanningSolver(object):
         list_len = [len(i) for i in result]
         t_max = max(list_len)
         
+        #radar_loc = returnradar(agent, result, t, timeradar)
         t = 0
-        while t < t_max:
-            for agent in range(self.num_of_agents):
-                
-
-                radar_loc = returnradar(agent, result, t, timeradar)
-
-                agent_objects[agent].radar(radar_loc, radar, agent_objects,t)
-                result[agent] = agent_objects[agent].path
-            
-            list_len = [len(i) for i in result]
-            t_max = max(list_len)               #update t max as total time could be increased!Alpha_[0]'
-            t += 1
-            
-            remaining_coll = detect_collisions(radar_loc)
-            if len(remaining_coll)>0:     # stay at the current timestep if there still are collisions that can be detected and run the iterations all over again
-            #     t += -1   
-                for coll in remaining_coll:
-                    if coll['timestep'] - t <1:
-                        t += -1
-                        continue    
         
+        
+        while t < t_max:
+            it = 0
+            remaining_coll = detect_collisions(result)
+            while it <50 and len(remaining_coll)>0:
+                for agent in range(self.num_of_agents):
+                    
+    
+                    radar_loc = returnradar(agent, result, t, timeradar)
+    
+                    agent_objects[agent].radar(radar_loc, radar, agent_objects,t)
+                    result[agent] = agent_objects[agent].path
+                
+                list_len = [len(i) for i in result]
+                t_max = max(list_len)               #update t max as total time could be increased!Alpha_[0]'
+                remaining_coll = detect_collisions(result)
+                it += 1
+            # if len(detect_collisions(result)) > 0:
+            #     t = t - 1
+            else:    
+                t += 1
+            
+            
+            # if len(remaining_coll)>0:     # stay at the current timestep if there still are collisions that can be detected and run the iterations all over again
+            #     print(remaining_coll)  
+            #     for coll in remaining_coll:
+            #         if coll['timestep']  <1:
+            #             t = t - 1
+            #             break
+            #         if len(remaining_coll) == 1 and coll['timestep'] > 0:
+            #             t += 1
+                        
+            # else:
+            #     t +=1
+            
+            # if t < 0:
+            #     t = 0
 
             
 
@@ -84,4 +102,4 @@ class DistributedPlanningSolver(object):
         #print(result)
 
         # Hint: this should be the final result of the distributed planning (visualization is done after planning)
-        return result
+        return result, len(detect_collisions(result))

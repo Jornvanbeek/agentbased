@@ -17,7 +17,7 @@ from mapmaker import randommapmaker
 
 # new
 batch = False
-# batch = True
+#batch = True
 
 # "CBS",
 solverlist = ["Distributed"]
@@ -30,7 +30,7 @@ if batch == True:
     solverlist = ["Distributed"]
 
 
-n_agents = 30
+n_agents = 10
 grid_y = 10
 grid_x = 22
 n_obstacles = 25
@@ -41,6 +41,12 @@ mincost = mincost.split(",")
 
 starttime = timer.time()
 batch_cost = 0
+
+
+starttime = timer.time()
+batch_cost = 0
+
+prio_coll = ' '
 
 
 def print_mapf_instance(my_map, starts, goals):
@@ -100,7 +106,7 @@ def import_mapf_instance(filename, n_agents=n_agents, grid_y=grid_y, grid_x=grid
         1 1 1 5         # agent 1 starts at (1,1) and has (1,5) as goal
         1 2 1 4         # agent 2 starts at (1,2) and has (1,4) as goal
     """
-    if filename == 'instances/random.txt':
+    if filename == 'instances/random.txt':                              
         return randommapmaker(n_agents, grid_y, grid_x, n_obstacles)
 
     f = Path(filename)
@@ -158,6 +164,7 @@ for SOLVER in solverlist:
         for file in sorted(glob.glob(args.instance)):
 
             print("***Import an instance***")
+            print("filename: ----   ", file)
             my_map, starts, goals = import_mapf_instance(file)
             print_mapf_instance(my_map, starts, goals)
 
@@ -173,35 +180,44 @@ for SOLVER in solverlist:
                 print("***Run Prioritized***")
                 solver = PrioritizedPlanningSolver(my_map, starts, goals)
                 paths = solver.find_solution()
+
+                
             elif args.solver == "Distributed":  # Wrapper of distributed planning solver class
                 print("***Run Distributed Planning***")
                 # !!!TODO: add your own distributed planning implementation here.
                 solver = DistributedPlanningSolver(my_map, starts, goals)  # ,....
                 paths = solver.find_solution()
+                #method to write amount of collisions to results.csv:
+                prio_coll = paths[-1]                                       
+                paths = paths[0]
             else:
                 raise RuntimeError("Unknown solver!")
-
+            
+            # generate two methods of writing to results.csv, if the file is a test_* file, a comparison with the optimal can be made    
             cost = get_sum_of_cost(paths)
             if file[10] == 't':
                 mincost_instance = int(mincost[mincost.index('\n'+file.replace("\\", "/"))+1])
-                result_file.write("{},{},{},{}\n".format(file, cost, sum(cost), sum(cost)-mincost_instance))
+                result_file.write("{},{},{},{}\n".format(file, cost, prio_coll, sum(cost)-mincost_instance))
             else:
                 result_file.write("{},{},{}\n".format(file, cost, sum(cost)))
+                print("working on:---- ",file)
             batch_cost += sum(cost)
-
+            
             if not batch:
                 print("***Test paths on a simulation***")
                 animation = Animation(my_map, starts, goals, paths)
-                # animation.save("output.mp4", 1.0) # install ffmpeg package to use this option
                 animation.show(solver=SOLVER, filename=file)
         result_file.close()
+    
+    # print the cpu clock    
     print("cpu time overall:", timer.time()-starttime)
-
+    
+    #print difference between optimal and current batch cost
     if batch:
         print("BATCH total difference between solutions and optimal: ", batch_cost-1850)
-
+    
+    #print difference between optimal and current individual test cost
     elif len(defaultinstance) > 10:
         if defaultinstance[10] == 't':
-
             mincost_instance = int(mincost[mincost.index('\n'+defaultinstance)+1])
             print("INDIVIDUAL difference between current solution and optimal: ",  sum(cost)-mincost_instance)

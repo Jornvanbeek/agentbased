@@ -117,7 +117,7 @@ def is_constrained(curr_loc, next_loc, next_time, constraint_table):
 
                 if len(goalcon) == 4:                               # extra check if the key "goaltime" is added
                     if next_time >= goalcon['goaltime']:            # check if the agent has already reached the goal
-                        if goalcon['loc'][0] == next_loc:  # and if the secondary agent wants to move to the reached goal
+                        if goalcon['loc'][0] == next_loc:           # and if the secondary agent wants to move to the reached goal
                             return True                             # then it is constrained
                         else:
                             continue
