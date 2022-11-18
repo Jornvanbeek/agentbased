@@ -84,32 +84,25 @@ def randommapmaker(n_agents, grid_y, grid_x, n_obstacles):
     goals = []
     i = 0
     
-    std_starts = []
-    std_goals= []
-    for i in range(1,len(my_map)-1):
-        std_starts.append([i,1])
-        std_goals.append([len(my_map)-i, 22])
-        std_starts.append([i,22])
-        std_goals.append([len(my_map)-i, 1])
-    
     std_loc = True
     std_map = False
-    std_map = 2
+    std_map = 3
     
     if std_map != False:
         filename = 'instances/layout'+str(std_map)+'.txt'
         my_map, generic_starts, generic_goals = import_mapf_instance(filename)
     
+    std_starts = []
+    std_goals= []
+    for i in range(1,len(my_map)-1):
+        std_starts.append([i,1])
+        std_goals.append([len(my_map)-i-1, 22])
+        std_starts.append([i,22])
+        std_goals.append([len(my_map)-i-1, 1])
     
-    # while i < n_obstacles:
-    #     x_obstacle = rd.randint(0, grid_x)
-    #     y_obstacle = rd.randint(0, grid_y)
-    #     obstacle = [x_obstacle,y_obstacle]
+
     
-    #     if obstacle not in obstacles and obstacle not in starts and obstacle not in goals:
-    #         obstacles.append([x_obstacle,y_obstacle])
-    #         i = i + 1
-    
+
     
     
     if std_map == False:
@@ -120,6 +113,7 @@ def randommapmaker(n_agents, grid_y, grid_x, n_obstacles):
             for j in range(len(my_map[i])):
                 if my_map[i][j]==True:
                     obstacles.append([i,j])
+    
     if std_loc == False:
         starts = random_coordinates(n_agents, obstacles, starts, goals, grid_x , grid_y )
         goals = random_coordinates(n_agents, obstacles, starts, goals, grid_x , grid_y )
@@ -177,6 +171,3 @@ def randommapmaker(n_agents, grid_y, grid_x, n_obstacles):
     for i in range(len(goals)):
         goals[i] = tuple(goals[i])
     return my_map,starts,goals 
-#print_mapf_instance(my_map, starts, goals)
-#get a_star to find out if start is connected to goal!!
-#my_map, starts, goals = randommapmaker(n_agents, grid_y, grid_x, n_obstacles)

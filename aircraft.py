@@ -8,7 +8,7 @@ import math
 from single_agent_planner import compute_heuristics, a_star, get_sum_of_cost, get_location
 from cbs import detect_collision, detect_collisions
 
-radar =9
+radar = 9
 timeradar = radar
 
 
@@ -68,10 +68,10 @@ class AircraftDistributed(object):
 
         for constraint in self.constraints:
             
-            if t == constraint["timestep"]-1:
+            if t == constraint["timestep"]-1 or t == constraint["timestep"]-2:
                 third_agent = agent_objects[constraint["constrained_by"]]
 
-                temp_constraints = self.constraints
+                temp_constraints = self.constraints.copy()
                 temp_constraints.remove(constraint)
 
                 if t < len(self.path):

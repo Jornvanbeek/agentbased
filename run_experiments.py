@@ -17,23 +17,23 @@ from mapmaker import randommapmaker
 
 # new
 batch = False
-#batch = True
+batch = True
 
 # "CBS",
 solverlist = ["Distributed"]
-defaultinstance = 'instances/test_25.txt'
+defaultinstance = 'instances/test_47.txt'
 
-#defaultinstance = 'instances/random.txt'
+defaultinstance = 'instances/random.txt'
 
 if batch == True:
     defaultinstance = 'instances/test_*.txt'
     solverlist = ["Distributed"]
 
 
-n_agents = 10
-grid_y = 10
-grid_x = 22
-n_obstacles = 25
+n_agents = 18
+grid_y = 30
+grid_x = 50
+n_obstacles = 40
 
 
 mincost = open("instances/min-sum-of-cost.csv", "r").read()

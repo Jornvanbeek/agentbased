@@ -66,14 +66,23 @@ class DistributedPlanningSolver(object):
                     agent_objects[agent].radar(radar_loc, radar, agent_objects,t)
                     result[agent] = agent_objects[agent].path
                 
-                list_len = [len(i) for i in result]
-                t_max = max(list_len)               #update t max as total time could be increased!Alpha_[0]'
-                remaining_coll = detect_collisions(result)
+              #update t max as total time could be increased!Alpha_[0]'
+                shortened_results = []
+                for i in range(len(result)):
+                    shortened = result[i][t:t+radar]
+                    if len(shortened) > 0:
+                        shortened_results.append(shortened)
+                    else:
+                        shortened_results.append(result[i][-1])
+                remaining_coll = detect_collisions(shortened_results)
                 it += 1
             # if len(detect_collisions(result)) > 0:
             #     t = t - 1
             else:    
                 t += 1
+            
+            list_len = [len(i) for i in result]
+            t_max = max(list_len) 
             
             
             # if len(remaining_coll)>0:     # stay at the current timestep if there still are collisions that can be detected and run the iterations all over again
