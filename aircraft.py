@@ -12,14 +12,14 @@ radar = 9
 timeradar = radar
 
 
-def calc_distance(path1, path2, time):  # change this to a heuristics based function?
+def calc_distance(path1, path2, time):  # to calculate the distance between two agents
     loc1 = get_location(path1, time)
     loc2 = get_location(path2, time)
     distance = math.sqrt((loc1[0]-loc2[0])**2 + (loc1[1]-loc2[1])**2)
     return distance
 
 
-def returnradar(agent, paths, time, timeradar=timeradar):
+def returnradar(agent, paths, time, timeradar=timeradar):  # get the field of vision for an agent in timeradar steps in the future
     radar_loc = []
 
     for j in range(len(paths)):
@@ -32,7 +32,7 @@ def returnradar(agent, paths, time, timeradar=timeradar):
     return radar_loc
 
 
-def detect_stalemate(path1, path2, t):
+def detect_stalemate(path1, path2, t):  # detect if two agents want to pass each other when one has already reached its destination
 
     if path1[t-1] == path1[t] and path2[t-1] == path2[t]:
         return True
@@ -60,23 +60,23 @@ class AircraftDistributed(object):
         self.constraints = constraints
         self.it = 0
 
-    def find_individual_solution(self, constraints):
+    def find_individual_solution(self, constraints):  # find shortest path
         self.path = a_star(self.my_map, self.start, self.goal, self.heuristics, self.id, constraints)
         return self.path
 
     def radar(self, radar_loc, radar_range, agent_objects, t):
 
-        for constraint in self.constraints:
+        for constraint in self.constraints:  # loop over all constraints to see if the constraint is still required
 
-            if t == constraint["timestep"]-1 or t == constraint["timestep"]-2:
+            if t == constraint["timestep"]-1 or t == constraint["timestep"]-2:  # 1 or 2 steps in the future
 
-                third_agent = agent_objects[constraint["constrained_by"]]
+                third_agent = agent_objects[constraint["constrained_by"]]  # get the data from the constraining agent
 
-                temp_constraints = self.constraints.copy()
-                temp_constraints.remove(constraint)
+                temp_constraints = self.constraints.copy()  # make a copy
+                temp_constraints.remove(constraint)  # remove constraint
 
                 if t < len(self.path):
-                    future = a_star(self.my_map, self.path[t], self.goal, self.heuristics,
+                    future = a_star(self.my_map, self.path[t], self.goal, self.heuristics,  # make a new shortest pats without the constraint
                                     self.id, temp_constraints, timestep=t)
                     if future != None:
                         new_path = self.path[:t] + future
@@ -85,31 +85,33 @@ class AircraftDistributed(object):
                 else:
                     new_path = self.path
 
+                # if there are collissions without the constraint, do not change the path or constraints and continue to the next constraint
                 if detect_collision(new_path, third_agent.path)[0] != None:
                     continue
                 else:
 
-                    self.constraints = temp_constraints
+                    self.constraints = temp_constraints  # if there are no collissions, remove the constraint
                 self.path = new_path
 
-        for j in range(len(radar_loc)):
+        for j in range(len(radar_loc)):  # loop over all agents
             second_agent = agent_objects[j]
 
             if self.id != j:
-                if calc_distance(radar_loc[self.id], radar_loc[j], 0) > radar_range:
+                if calc_distance(radar_loc[self.id], radar_loc[j], 0) > radar_range:  # calc distance
                     continue
                 else:
 
-                    coll = detect_collision(radar_loc[self.id], radar_loc[j])
+                    coll = detect_collision(radar_loc[self.id], radar_loc[j])  # get collissions
 
-                    while coll[0] != None and self.it < 500:
+                    while coll[0] != None and self.it < 500:  # if collissions, solve it
                         self.it += 1
 
                         # if self.it < 10 or self.it % 100 == 0:
                         #     print(self.it, "iterations")
                         #     print("agent1: ", self.id, "agent2: ", j, "timesteps in the future: ", coll[-1])
 
-                        constraint1 = [{'agent': self.id, 'constrained_by': j, 'loc': coll[0], 'timestep': coll[-1]+t}]
+                        constraint1 = [{'agent': self.id, 'constrained_by': j, 'loc': coll[0],
+                                        'timestep': coll[-1]+t}]  # make the first constraint
 
                         loc2 = []
 
@@ -120,7 +122,8 @@ class AircraftDistributed(object):
                             loc2.append(coll[0][1])
                             loc2.append(coll[0][0])
 
-                        constraint2 = [{'agent': j, 'constrained_by': self.id, 'loc': loc2, 'timestep': coll[-1]+t}]
+                        constraint2 = [{'agent': j, 'constrained_by': self.id,
+                                        'loc': loc2, 'timestep': coll[-1]+t}]  # make second constraint
 
                         if t < len(self.path):
                             future = a_star(self.my_map, self.path[t], self.goal, self.heuristics,
