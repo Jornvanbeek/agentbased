@@ -8,7 +8,7 @@ import math
 from single_agent_planner import compute_heuristics, a_star, get_sum_of_cost, get_location
 from cbs import detect_collision, detect_collisions
 
-radar = 9
+radar = 13
 timeradar = radar
 
 
@@ -105,12 +105,12 @@ class AircraftDistributed(object):
 
                     coll = detect_collision(radar_loc[self.id], radar_loc[j])
 
-                    while coll[0] != None and self.it < 200:
+                    while coll[0] != None and self.it < 500:
                         self.it += 1
 
-                        if self.it < 10 or self.it % 100 == 0:
-                            print(self.it, "iterations")
-                            print("agent1: ", self.id, "agent2: ", j, "timesteps in the future: ", coll[-1])
+                        # if self.it < 10 or self.it % 100 == 0:
+                        #     print(self.it, "iterations")
+                        #     print("agent1: ", self.id, "agent2: ", j, "timesteps in the future: ", coll[-1])
 
                         constraint1 = [{'agent': self.id, 'constrained_by': j, 'loc': coll[0], 'timestep': coll[-1]+t}]
 
@@ -177,7 +177,7 @@ class AircraftDistributed(object):
                         temp_radar = returnradar(self.id, [new_path, new_path_second], t)
                         temp_coll = detect_collision(temp_radar[0], temp_radar[1])
 
-                        if temp_coll[0] == None and len(new_path+new_path_second) <= len(second_agent.path+new_path) and len(new_path+new_path_second) <= len(self.path+new_path_second) and not detect_stalemate(temp_radar[0], temp_radar[1], coll[-1]):
+                        if temp_coll[0] == None and len(new_path+new_path_second) < len(second_agent.path+new_path) and len(new_path+new_path_second) < len(self.path+new_path_second) and not detect_stalemate(temp_radar[0], temp_radar[1], coll[-1]):
                             self.path = new_path
                             second_agent.path = new_path_second
                             self.constraints = self.constraints + constraint1
@@ -203,7 +203,7 @@ class AircraftDistributed(object):
                             #print('first agents constraint')
 
                         else:
-                            print('no solution')
+                            #print('no solution')
                             break
                         new_radar = returnradar(self.id, [self.path, second_agent.path], t)
                         radar_loc[self.id] = new_radar[0]

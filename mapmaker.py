@@ -171,3 +171,28 @@ def randommapmaker(n_agents, grid_y, grid_x, n_obstacles):
     for i in range(len(goals)):
         goals[i] = tuple(goals[i])
     return my_map,starts,goals 
+
+def mapwriter():
+    for n_agents in range(1,18):
+        for i in range(3,4):
+            #n_agents = 8
+            grid_y = 11
+            grid_x = 24
+            n_obstacles = 50
+            my_map,starts,goals = randommapmaker(n_agents, grid_y, grid_x, n_obstacles)
+            #print(my_map)
+            
+            with open('standard_maps/new_random_' + str(n_agents)+ "_" + str(i) + '.txt', 'w') as f:
+                f.write(str(grid_y) + ' '+ str(grid_x)+'\n')
+                for i in range(len(my_map)):
+                    for j in range(len(my_map[i])):
+                        if my_map[i][j]== True:
+                            f.write("@ ")
+                        elif my_map[i][j]== False:
+                            f.write(". ")
+                    f.write("\n")
+                f.write(str(n_agents)+ "\n")
+                for k in range(n_agents):
+                    f.write(str(starts[k][0]) + " " + str(starts[k][1]) + " " + str(goals[k][0]) + " " + str(goals[k][1]) + "\n")
+
+#mapwriter()

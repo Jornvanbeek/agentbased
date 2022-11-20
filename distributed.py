@@ -55,7 +55,7 @@ class DistributedPlanningSolver(object):
         while t < t_max:
             it = 0
             remaining_coll = detect_collisions(result)
-            while it < 50 and len(remaining_coll) > 0:
+            while it < 100 and len(remaining_coll) > 0:
                 for agent in range(self.num_of_agents):
 
                     radar_loc = returnradar(agent, result, t, timeradar)

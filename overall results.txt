@@ -1,0 +1,3 @@
+map 1, distributed, radar = 9,[656, 30],686 t = 10.819504261016846
+map 1, distributed, radar = 15,[590,26] t = 22.0
+
