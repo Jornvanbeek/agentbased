@@ -63,10 +63,7 @@ class DistributedPlanningSolver(object):
                     agent_objects[agent].radar(radar_loc, radar, agent_objects, t)
                     result[agent] = agent_objects[agent].path
 
-
-
-                
-              #update t max as total time could be increased!Alpha_[0]'
+              # update t max as total time could be increased!Alpha_[0]'
                 shortened_results = []
                 for i in range(len(result)):
                     shortened = result[i][t:t+radar]
@@ -81,10 +78,8 @@ class DistributedPlanningSolver(object):
             else:
                 t += 1
 
-            
             list_len = [len(i) for i in result]
-            t_max = max(list_len) 
-            
+            t_max = max(list_len)
 
         # Print final output
         print("\n Found a solution! \n")

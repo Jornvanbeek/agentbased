@@ -23,16 +23,16 @@ batch = False
 batch = True
 
 # "CBS",
-solverlist = [ "Distributed"]
+solverlist = ["Distributed"]
 defaultinstance = 'instances/random.txt'
-defaultinstance ='standard_maps/new_random_10_1.txt'
+defaultinstance = 'standard_maps/new_random_10_1.txt'
 
 #defaultinstance = 'instances/random.txt'
 
 if batch == True:
     defaultinstance = 'instances/test_*.txt'
-    defaultinstance ='new_instances/new_random_*.txt'
-    defaultinstance ='standard_maps/new_random_*_3.txt'
+    defaultinstance = 'new_instances/new_random_*.txt'
+    defaultinstance = 'standard_maps/new_random_*_3.txt'
     solverlist = ["Prioritized", "Distributed", "CBS"]
 
 
@@ -149,8 +149,8 @@ def import_mapf_instance(filename, n_agents=n_agents, grid_y=grid_y, grid_x=grid
     return my_map, starts, goals
 
 
-allcosts = [ [], [], [] ]
-alltimes = [ [], [], [] ]
+allcosts = [[], [], []]
+alltimes = [[], [], []]
 for k in range(len(solverlist)):
     SOLVER = solverlist[k]
     filetime = []
@@ -169,10 +169,10 @@ for k in range(len(solverlist)):
         args = parser.parse_args()
         # Hint: Command line options can be added in Spyder by pressing CTRL + F6 > Command line options.
         # In PyCharm, they can be added as parameters in the configuration.
-        name = "results"+ SOLVER + ".csv"
+        name = "results" + SOLVER + ".csv"
         result_file = open(name, "w", buffering=1)
         batch_cost = 0
-        
+
         for file in sorted(glob.glob(args.instance)):
             filetime = timer.time()
             print("***Import an instance***")
@@ -220,13 +220,11 @@ for k in range(len(solverlist)):
                 print("***Test paths on a simulation***")
                 animation = Animation(my_map, starts, goals, paths)
                 animation.show(solver=SOLVER, filename=file)
-        
+
         result_file.write(str(batch_cost)+"\n")
         result_file.write(str(timer.time()-starttime))
         result_file.close()
 
-        
-    
     # print the cpu clock
     print("cpu time overall:", timer.time()-starttime)
 
@@ -251,116 +249,102 @@ for k in range(len(solverlist)):
 
 
 if batch == True:
-    if len(solverlist)>2:
-        fig, axs = plt.subplots(2,2)
+    if len(solverlist) > 2:
+        fig, axs = plt.subplots(2, 2)
         fig.suptitle('Comparison between different planning methods on a 8x8 map, n= 200, 8 agents, 6 obstacles')
-        
+
         # basic plot
-        axs[0,0].boxplot(allcosts, 0, '')
-        
+        axs[0, 0].boxplot(allcosts, 0, '')
+
         axs[0, 1].boxplot(allcosts)
-        
-        
+
         # don't show outlier points
-        axs[1,0].boxplot(alltimes, 0, '')
-        
-        
+        axs[1, 0].boxplot(alltimes, 0, '')
+
         # don't show outlier points
-        axs[1,1].boxplot(alltimes)
-        
-        
-        axs[0,0].set(
+        axs[1, 1].boxplot(alltimes)
+
+        axs[0, 0].set(
             axisbelow=True,  # Hide the grid behind plot objects
-        
+
             xlabel='Distribution per planning method',
             ylabel='Total costs per file without outliers',
         )
-        axs[0,0].yaxis.grid(True, linestyle='-', which='major', color='lightgrey',
-                       alpha=0.5)
-        
-        
-        axs[0,1].set(
+        axs[0, 0].yaxis.grid(True, linestyle='-', which='major', color='lightgrey',
+                             alpha=0.5)
+
+        axs[0, 1].set(
             axisbelow=True,  # Hide the grid behind plot objects
-        
+
             xlabel='Distribution per planning method',
-            ylabel= 'Total costs per file with outliers',
+            ylabel='Total costs per file with outliers',
         )
-        axs[0,1].yaxis.grid(True, linestyle='-', which='major', color='lightgrey',
-                       alpha=0.5)
-        
-        
-        axs[1,0].set(
+        axs[0, 1].yaxis.grid(True, linestyle='-', which='major', color='lightgrey',
+                             alpha=0.5)
+
+        axs[1, 0].set(
             axisbelow=True,  # Hide the grid behind plot objects
-        
+
             xlabel='Distribution per planning method',
             ylabel='T compute without outliers (s)',
         )
-        axs[1,0].yaxis.grid(True, linestyle='-', which='major', color='lightgrey',
-                       alpha=0.5)
-        
-        
-        axs[1,1].set(
+        axs[1, 0].yaxis.grid(True, linestyle='-', which='major', color='lightgrey',
+                             alpha=0.5)
+
+        axs[1, 1].set(
             axisbelow=True,  # Hide the grid behind plot objects
-        
+
             xlabel='Distribution per planning method',
             ylabel='T compute with outliers',
         )
-        axs[1,1].yaxis.grid(True, linestyle='-', which='major', color='lightgrey',
-                       alpha=0.5)
-        
-        
+        axs[1, 1].yaxis.grid(True, linestyle='-', which='major', color='lightgrey',
+                             alpha=0.5)
+
         for i in range(2):
-            axs[i,0].set_xticklabels(solverlist,
-                                  rotation=45)
-            axs[i,1].set_xticklabels(solverlist,
-                                  rotation=45)
-        
+            axs[i, 0].set_xticklabels(solverlist,
+                                      rotation=45)
+            axs[i, 1].set_xticklabels(solverlist,
+                                      rotation=45)
+
     # print([np.average(allcosts[0]), np.average(allcosts[1]), np.average(allcosts[2])])
     # print([np.sum(alltimes[0]), np.sum(alltimes[1]), np.sum(alltimes[2])])
     # if len(solverlist)>2:
     #     print([np.average(alltimes[0]), np.average(alltimes[1]), np.average(alltimes[2])])
-    
+
     plt.figure()
-    
+
     file_compensator = len(allcosts[0]) - 9
-    
+
     allcosts[0] = allcosts[0][file_compensator:]+allcosts[0][:file_compensator]
     allcosts[1] = allcosts[1][file_compensator:]+allcosts[1][:file_compensator]
-    if len(solverlist)>2:
+    if len(solverlist) > 2:
         allcosts[2] = allcosts[2][file_compensator:]+allcosts[2][:file_compensator]
     alltimes[0] = alltimes[0][file_compensator:]+alltimes[0][:file_compensator]
     alltimes[1] = alltimes[1][file_compensator:]+alltimes[1][:file_compensator]
-    if len(solverlist)>2:
+    if len(solverlist) > 2:
         alltimes[2] = alltimes[2][file_compensator:]+alltimes[2][:file_compensator]
-    
-    
-    
-    
-    plt.plot(np.arange(1,len(allcosts[0])+1),allcosts[0])
-    plt.plot(np.arange(1,len(allcosts[0])+1),allcosts[1])
-    if len(solverlist)>2:
-        plt.plot(np.arange(1,len(allcosts[0])+1),allcosts[2])
+
+    plt.plot(np.arange(1, len(allcosts[0])+1), allcosts[0])
+    plt.plot(np.arange(1, len(allcosts[0])+1), allcosts[1])
+    if len(solverlist) > 2:
+        plt.plot(np.arange(1, len(allcosts[0])+1), allcosts[2])
     plt.title('Cost for increasing number of agents, layout 3')
     plt.ylabel("Total cost")
     plt.xlabel("Amount of agents")
     plt.legend(solverlist)
     plt.show()
-    
-    if len(solverlist)>2:
+
+    if len(solverlist) > 2:
         plt.figure()
-        plt.plot(np.arange(1,len(allcosts[0])+1),np.array(allcosts[0])-np.array(allcosts[2]))
-        plt.plot(np.arange(1,len(allcosts[0])+1),np.array(allcosts[1])-np.array(allcosts[2]))
+        plt.plot(np.arange(1, len(allcosts[0])+1), np.array(allcosts[0])-np.array(allcosts[2]))
+        plt.plot(np.arange(1, len(allcosts[0])+1), np.array(allcosts[1])-np.array(allcosts[2]))
         plt.title('Additional cost for Prioritized and Distributed layout 3')
         plt.ylabel("Additional cost")
         plt.xlabel("Amount of agents")
         plt.legend(solverlist[:2])
-    
-        plt.show()
-    
-    
-    
 
-    
+        plt.show()
+
     # plt.figure()
     # plt.plot([np.average(alltimes[0]), np.average(alltimes[1]), np.average(alltimes[2])])
     # plt.title('Cost for increasing number of agents, layout 1')
@@ -368,39 +352,38 @@ if batch == True:
     # plt.xlabel("Solver")
     # plt.legend(solverlist)
     # plt.show()
-    
-    
+
     plt.figure()
     plt.plot([np.sum(alltimes[0]), np.sum(alltimes[1]), np.sum(alltimes[2])])
     plt.show()
 
     plt.figure()
-    plt.plot(np.arange(1,len(alltimes[0])+1),alltimes[0])
-    plt.plot(np.arange(1,len(alltimes[0])+1),alltimes[1])
-    if len(solverlist)>2:
-        plt.plot(np.arange(1,len(alltimes[0])+1),alltimes[2])
+    plt.plot(np.arange(1, len(alltimes[0])+1), alltimes[0])
+    plt.plot(np.arange(1, len(alltimes[0])+1), alltimes[1])
+    if len(solverlist) > 2:
+        plt.plot(np.arange(1, len(alltimes[0])+1), alltimes[2])
     plt.title('Computation time for increasing number of agents, layout 3')
     plt.ylabel("Computation time [s]")
     plt.xlabel("Amount of agents")
     plt.legend(solverlist)
     plt.show()
-    
+
     plt.figure()
-    plt.plot(np.arange(1,len(alltimes[0])+1),alltimes[0])
-    plt.plot(np.arange(1,len(alltimes[0])+1),alltimes[1])
-    if len(solverlist)>2:
-        plt.plot(np.arange(1,len(alltimes[0])),alltimes[2][:-1])
+    plt.plot(np.arange(1, len(alltimes[0])+1), alltimes[0])
+    plt.plot(np.arange(1, len(alltimes[0])+1), alltimes[1])
+    if len(solverlist) > 2:
+        plt.plot(np.arange(1, len(alltimes[0])), alltimes[2][:-1])
     plt.title('Computation time for increasing number of agents, layout 3')
     plt.ylabel("Computation time [s]")
     plt.xlabel("Amount of agents")
     plt.legend(solverlist)
     plt.show()
-    
+
     # layout 1
     # [183.08333333333334, 175.5, 170.08333333333334]
     # [0.3116722106933594, 6.539522409439087, 1747.9386405944824]
     # [0.025972684224446613, 0.5449602007865906, 145.66155338287354]
-    
+
     """
     layout 2
 [144.0, 141.66666666666666, 138.55555555555554]
