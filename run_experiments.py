@@ -44,8 +44,8 @@ starttime = timer.time()
 batch_cost = 0
 
 
-starttime = timer.time()
-# batch_cost = 0
+
+
 
 prio_coll = ' '
 
@@ -209,6 +209,7 @@ for k in range(len(solverlist)):
             cost = get_sum_of_cost(paths)
             allcosts[k].append(sum(cost))
             alltimes[k].append(timer.time()-filetime)
+            
             if file[10] == 't':
                 mincost_instance = int(mincost[mincost.index('\n'+file.replace("\\", "/"))+1])
                 result_file.write("{},{},{},{}\n".format(file, cost, prio_coll, sum(cost)-mincost_instance))
