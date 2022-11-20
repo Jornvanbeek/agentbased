@@ -13,7 +13,7 @@ from pathlib import Path
 
 
 
-
+"""this file was created to speed up the process of developing maps. It is not part of the three planners!"""
 
 def import_mapf_instance(filename):
 

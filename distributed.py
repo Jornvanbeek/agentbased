@@ -46,7 +46,7 @@ class DistributedPlanningSolver(object):
             path = newAgent.find_individual_solution([])
 
             result.append(path)
-            agent_objects.append(newAgent)
+            agent_objects.append(newAgent)                                          #create agents with paths
         list_len = [len(i) for i in result]
         t_max = max(list_len)
 
@@ -55,15 +55,15 @@ class DistributedPlanningSolver(object):
         while t < t_max:
             it = 0
             remaining_coll = detect_collisions(result)
-            while it < 100 and len(remaining_coll) > 0:
+            while it < 100 and len(remaining_coll) > 0:                             # check if iterations within bounds, and collisions in radar range exist
                 for agent in range(self.num_of_agents):
 
-                    radar_loc = returnradar(agent, result, t, timeradar)
+                    radar_loc = returnradar(agent, result, t, timeradar)            # find all agents and their paths in radar range
 
-                    agent_objects[agent].radar(radar_loc, radar, agent_objects, t)
-                    result[agent] = agent_objects[agent].path
+                    agent_objects[agent].radar(radar_loc, radar, agent_objects, t)  # run the aircraft radar function
+                    result[agent] = agent_objects[agent].path                       #add to results
 
-              # update t max as total time could be increased!Alpha_[0]'
+                                                                                    # update t max as total time could be increased!
                 shortened_results = []
                 for i in range(len(result)):
                     shortened = result[i][t:t+radar]
@@ -71,7 +71,7 @@ class DistributedPlanningSolver(object):
                         shortened_results.append(shortened)
                     else:
                         shortened_results.append(result[i][-1])
-                remaining_coll = detect_collisions(shortened_results)
+                remaining_coll = detect_collisions(shortened_results)               #find out if there are still collisions
 
                 it += 1
 

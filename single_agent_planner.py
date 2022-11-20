@@ -25,7 +25,7 @@ def get_sum_of_cost(paths):
                 continue
             else:
                 rst += 1
-        # rst += len(path) - 1
+        
     return [rst, wait]
 
 
@@ -73,13 +73,12 @@ def build_constraint_table(constraints, agent):
     constraint_table = []
     j = 1
     for i in range(len(constraints)):
-        if constraints[i]["agent"] == agent:  # filter out constraints not belonging to this agent
-            j = constraints[i]["timestep"]  # save the timestep of the current constraint as integer
-            while len(constraint_table) < j+1:
-                # make sure constraint table is as long as the largest timestep to index by timestep
+        if constraints[i]["agent"] == agent:                                 # filter out constraints not belonging to this agent
+            j = constraints[i]["timestep"]                                   # save the timestep of the current constraint as integer
+            while len(constraint_table) < j+1:                               # make sure constraint table is as long as the largest timestep to index by timestep
                 constraint_table.append([])
 
-            constraint_table[j].append(constraints[i])  # add constraints to the constraints table, index is timestep
+            constraint_table[j].append(constraints[i])                       # add constraints to the constraints table, index is timestep
 
     return constraint_table
 
@@ -90,7 +89,7 @@ def get_location(path, time):
     elif time < len(path):
         return path[time]
     else:
-        return path[-1]  # wait at the goal location
+        return path[-1]                     # wait at the goal location
 
 
 def get_path(goal_node):
@@ -130,21 +129,21 @@ def is_constrained(curr_loc, next_loc, next_time, constraint_table):
         else:
             constraints = []
 
-        if len(constraints) > 0:  # any constraint for this timestep?
-            for i in range(len(constraints)):  # loop over constraints
+        if len(constraints) > 0:                                    # any constraint for this timestep?
+            for i in range(len(constraints)):                       # loop over constraints
                 con = constraints[i]
 
-                if len(con['loc']) == 1:  # if vertex constraint (format of  [(y,x)])
+                if len(con['loc']) == 1:                            # if vertex constraint (format of  [(y,x)])
                     if con['loc'][0] == next_loc:                   # if location is constrained
                         return True
                     else:
                         continue
-                if len(con['loc']) == 2:  # if edge constraint, format of [(y1,x1), (y2,x2)])
+                if len(con['loc']) == 2:                             # if edge constraint, format of [(y1,x1), (y2,x2)])
                     if con['loc'][0] == curr_loc and con['loc'][1] == next_loc:  # if move from curr_loc to next_loc constrained
                         return True
                     else:
                         continue
-                if len(con['loc']) == 0:                            # statement because of CBS, try to fix in CBS!!
+                if len(con['loc']) == 0:                            # statement because of CBS
                     continue
                 else:
                     raise RuntimeError("length of given constraint is not 1 or 2! constraint: ", con)
@@ -200,11 +199,10 @@ def a_star(my_map, start_loc, goal_loc, h_values, agent, constraints, timestep=0
 
             else:
                 con = 0
-                # loop over constraint table at the goal location
-                for i in range(timestep, len(constraint_table)):
+                for i in range(timestep, len(constraint_table)):                    # loop over constraint table at the goal location
                     if is_constrained(goal_loc, goal_loc, i, constraint_table):
                         con += 1
-                if con == 0:  # no future constraints at the goal location? then go there!
+                if con == 0:                                                        # no future constraints at the goal location? then go there!
                     return get_path(curr)
                 else:
                     continue

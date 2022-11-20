@@ -8,10 +8,12 @@ def detect_collision(path1, path2):
 
     # normal constraints
     for t in range(min(len(path1), len(path2))):
-
+        
+        #vertex collision
         if get_location(path1, t) == get_location(path2, t):
             return [get_location(path2, t)], t
 
+        # edge collision
         elif t > 0:
             if get_location(path1, t-1) == get_location(path2, t) and get_location(path1, t) == get_location(path2, t-1):
                 return [get_location(path1, t-1), get_location(path2, t-1)], t
@@ -23,7 +25,8 @@ def detect_collision(path1, path2):
     goal_timestep = min(len(path1), len(path2))-1
 
     for k in range(goal_timestep, max(len(path1), len(path2))):
-
+        
+        # check wich path is longer, and if it crosses the goal of the other
         if len(path1) >= len(path2):
             if get_location(path1, k) == get_location(path2, goal_timestep):
                 return [get_location(path1, k)], k
@@ -33,11 +36,12 @@ def detect_collision(path1, path2):
 
                 return [get_location(path2, k)], k
 
+    # no collision!
     return None, None
 
 
 def detect_collisions(paths):
-
+# returns a list of collisions, indexed by timestep, when multiple paths given as inputs
     collisions = []
     for i in range(len(paths)):
         for j in range(i, len(paths)):
@@ -56,6 +60,7 @@ def detect_collisions(paths):
 
 
 def standard_splitting(collision):
+    # returns two collisions for the two new nodes
     if len(collision) == 4:
         loc = collision['loc']
         loc2 = []
@@ -140,12 +145,12 @@ class CBSSolver(object):
                     print('cost: ', curr_node['cost'], ' amount of collisions left: ', len(curr_node['collisions']))
                     time = timer.time()
 
-                if len(curr_node['collisions']) == 0:             # collision free? there's your answer
+                if len(curr_node['collisions']) == 0:                           # collision free? there's your answer
                     print("no more collisions! ", i, " iterations")
                     print('cost: ', curr_node['cost'])
                     return curr_node['paths']
                 else:
-                    # detect_collisions(curr_node['paths'])[0])      # get two new constraints
+                    
                     constraints = standard_splitting(curr_node['collisions'][0])
                     for constraint in constraints:                              # loop over the two constraints and create new nodes
 
@@ -155,21 +160,21 @@ class CBSSolver(object):
                         new_node['paths'] = curr_node['paths'].copy()           # copy parent
 
                         if len(curr_node['paths'][agent]) == 1 and self.goals[agent] == constraint['loc'][0] and constraint['agent'] == agent:
-                            continue  # if an agent starts at its goal, and the new constraint is for its goal: dont add the constraint
-                        new_node['constraints'].append(constraint)          # add the new constraint
+                            continue                                            # if an agent starts at its goal, and the new constraint is for its goal: dont add the constraint
+                        new_node['constraints'].append(constraint)              # add the new constraint
 
                         path = a_star(self.my_map, self.starts[agent], self.goals[agent],
                                       self.heuristics[agent], agent, new_node['constraints'])  # retreive new paths for agents with the new constraint
 
                         if path is None:
-                            raise BaseException('No solutions')  # no solutions found
+                            raise BaseException('No solutions')                 # no solutions found
 
-                        new_node['paths'][agent] = path  # replace old path by new
+                        new_node['paths'][agent] = path                         # replace old path by new
                         new_node['collisions'] = detect_collisions(new_node['paths'])  # what are the collisions?
                         new_node['cost'] = sum(get_sum_of_cost(new_node['paths']))  # costs?
-                        self.push_node(new_node)  # add the new node to the open list
+                        self.push_node(new_node)                                # add the new node to the open list
 
-            return curr_node['paths']  # return if too much iterations have taken place: for debugging
+            return curr_node['paths']                                           # return if too much iterations have taken place: for debugging
 
     def print_results(self, node):
         print("\n Found a solution! \n")
